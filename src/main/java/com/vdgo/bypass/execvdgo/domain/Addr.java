@@ -11,7 +11,10 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "ch_adr_obj")
+//for MSSQL connection
+@Table(name = "ch_adr_obj", catalog = "tmp_to_ch_dog", schema = "dbo")
+//for PostgreSQL connection
+//@Table(name = "ch_adr_obj")
 @ToString(of = {"id", "addr"})
 @EqualsAndHashCode(of = {"id"})
 @Immutable

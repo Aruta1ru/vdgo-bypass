@@ -10,7 +10,10 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "one_bso_user")
+//for MSSQL connection
+@Table(name = "one_bso_user", catalog = "dog", schema = "dbo")
+//for PostgreSQL connection
+//@Table(name = "one_bso_user")
 @ToString(of = {"id", "name", "post"})
 @EqualsAndHashCode(of = {"id"})
 public class Executor {

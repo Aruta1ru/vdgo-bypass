@@ -4,16 +4,16 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum DogTypeEnum {
 
-    ABSENT(0, "отсутствует"),
-    INDIVIDUAL(1, "частное лицо"),
-    LEGALLAWYER(2, "юридическое лицо"),
-    SBK(3, "СБК");
+    ABSENT((byte) 0, "отсутствует"),
+    INDIVIDUAL((byte) 1, "частное лицо"),
+    LEGALLAWYER((byte) 2, "юридическое лицо"),
+    SBK((byte) 3, "СБК");
 
     private byte id;
     private String name;
 
-    DogTypeEnum(int id, String name) {
-        this.id = (byte) id;
+    DogTypeEnum(byte id, String name) {
+        this.id = id;
         this.name = name;
     }
 
