@@ -1,6 +1,7 @@
 package com.vdgo.bypass.execvdgo.domain;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.annotation.JsonView;
 import jdk.nashorn.internal.ir.annotations.Immutable;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -12,9 +13,9 @@ import javax.persistence.Table;
 
 @Entity
 //for MSSQL connection
-@Table(name = "ch_adr_obj", catalog = "tmp_to_ch_dog", schema = "dbo")
+//@Table(name = "ch_adr_obj", catalog = "tmp_to_ch_dog", schema = "dbo")
 //for PostgreSQL connection
-//@Table(name = "ch_adr_obj")
+@Table(name = "ch_adr_obj")
 @ToString(of = {"id", "addr"})
 @EqualsAndHashCode(of = {"id"})
 @Immutable
@@ -22,9 +23,11 @@ public class Addr {
 
     @Id
     @Column(name = "id_obj")
+    @JsonView(Views.BypassView.class)
     private int id;
 
     @Column(name = "addr")
+    @JsonView(Views.BypassView.class)
   //  @JsonValue
     private String addr;
 

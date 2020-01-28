@@ -1,6 +1,7 @@
 package com.vdgo.bypass.execvdgo.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.vdgo.bypass.execvdgo.enums.BypassDoneTypeEnum;
 import com.vdgo.bypass.execvdgo.enums.DogTypeEnum;
 import lombok.EqualsAndHashCode;
@@ -11,33 +12,39 @@ import java.time.LocalDateTime;
 
 @Entity
 //for MSSQL connection
-@Table(name = "vdg_obj_work", catalog = "tmp_to_ch_dog", schema="dbo")
+//@Table(name = "vdg_obj_work", catalog = "tmp_to_ch_dog", schema="dbo")
 //for PostgreSQL connection
-//@Table(name = "vdg_obj_work")
+@Table(name = "vdg_obj_work")
 @ToString(of = {"id", "address", "dogType", "executor", "bypassDate", "doneType"})
 @EqualsAndHashCode(of = {"id"})
 public class Bypass {
 
     @Id
+    @JsonView(Views.BypassView.class)
     private int id;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_object")
+    @JsonView(Views.BypassView.class)
     private Addr address;
 
     @Column(name = "type_dog")
     @Enumerated(EnumType.ORDINAL)
+    @JsonView(Views.BypassView.class)
     private DogTypeEnum dogType;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_exec")
+    @JsonView(Views.BypassView.class)
     private Executor executor;
 
     @Column(name = "date_action")
+    @JsonView(Views.BypassView.class)
     //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDateTime bypassDate;
 
     @Column(name = "exec_vdgo")
+    @JsonView(Views.BypassView.class)
     @Enumerated(EnumType.ORDINAL)
     private BypassDoneTypeEnum doneType;
 
