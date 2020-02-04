@@ -51,21 +51,22 @@ Vue.component('bypasses-list', {
                     '<th style="border: 2px solid red;">Статус выполнения</th>'+
                     '<bypass-row v-for="bypass in bypasses" :key="bypass.id" :bypass="bypass" :bypasses="bypasses" />'+
             '</table>',
-  created: function() {
-        bypassApi.get().then(result =>
-            result.json().then(data =>
-                data.forEach(bypass => this.bypasses.push(bypass))
-            )
-        )
-  }
 });
 
 var app = new Vue({
   el: '#app',
-  template: '<bypasses-list :bypasses="bypasses" />',
+  template:
+        '<div>' +
+                '<div v-if="!profile">Для работы с приложением необходимо <a href="/login">авторизоваться</a></div>' +
+                '<div v-else>' +
+                    '<div>{{profile.name}}&nbsp;<a href="/logout">Выйти</a></div>' +
+                    '<bypasses-list :bypasses="bypasses" />' +
+                '</div>' +
+        '</div>',
   data: {
-    bypasses: [
-
-    ]
+    bypasses: frontendData.bypasses,
+    profile: frontendData.profile
+  },
+  created: function() {
   }
 });

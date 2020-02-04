@@ -1,26 +1,23 @@
 package com.vdgo.bypass.execvdgo.domain;
 
-import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.vdgo.bypass.execvdgo.enums.UserRole;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import java.util.Collection;
-import java.util.HashSet;
+import java.io.Serializable;
 import java.util.Set;
 
 @Entity
 //for MSSQL connection
-//@Table(name = "one_bso_user", catalog = "dog", schema = "dbo")
+@Table(name = "one_bso_user", catalog = "test_dog", schema = "dbo")
 //for PostgreSQL connection
-@Table(name = "one_bso_user")
+//@Table(name = "one_bso_user")
 @ToString(of = {"id", "name", "post", "valid", "roles"})
 @EqualsAndHashCode(of = {"id"})
-public class Executor implements UserDetails {
+public class Executor implements Serializable, UserDetails {
 
     @Id
     @Column(name = "id_bso_user")
@@ -29,7 +26,6 @@ public class Executor implements UserDetails {
 
     @Column(name = "fio")
     @JsonView(Views.BypassView.class)
-   // @JsonValue
     private String name;
 
     @Column(name = "dolgn")
@@ -50,7 +46,7 @@ public class Executor implements UserDetails {
     @ElementCollection(targetClass = UserRole.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "id_bso_user"))
     @Enumerated(EnumType.STRING)
-    private Set<UserRole> roles;
+    private Set<UserRole> authorities;
 
     public void setId(int id) {
         this.id = id;
@@ -85,8 +81,8 @@ public class Executor implements UserDetails {
     }
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return getRoles();
+    public Set<UserRole> getAuthorities() {
+        return this.authorities;
     }
 
     public String getPassword() {
@@ -103,14 +99,6 @@ public class Executor implements UserDetails {
 
     public void setValid(boolean valid) {
         this.valid = valid;
-    }
-
-    public Set<UserRole> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(Set<UserRole> roles) {
-        this.roles = roles;
     }
 
     public int getId() {

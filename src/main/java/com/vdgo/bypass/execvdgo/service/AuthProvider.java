@@ -29,13 +29,12 @@ public class AuthProvider implements AuthenticationProvider {
 
         if(executor != null && (executor.getUsername().equals(username)))
         {
-            //if(!passwordEncoder.matches(password, executor.getPassword()))
             if (!password.equals(executor.getPassword()))
             {
                 throw new BadCredentialsException("Неверный пароль! Повторите ввод!");
             }
 
-            Collection<? extends GrantedAuthority> authorities = executor.getRoles();
+            Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
 
             return new UsernamePasswordAuthenticationToken(executor, password, authorities);
         }

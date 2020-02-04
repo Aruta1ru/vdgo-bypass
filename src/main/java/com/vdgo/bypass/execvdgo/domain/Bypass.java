@@ -6,15 +6,16 @@ import com.vdgo.bypass.execvdgo.enums.BypassDoneTypeEnum;
 import com.vdgo.bypass.execvdgo.enums.DogTypeEnum;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
 //for MSSQL connection
-//@Table(name = "vdg_obj_work", catalog = "tmp_to_ch_dog", schema="dbo")
+@Table(name = "vdg_obj_work", catalog = "tmp_to_ch_dog", schema="dbo")
 //for PostgreSQL connection
-@Table(name = "vdg_obj_work")
+//@Table(name = "vdg_obj_work")
 @ToString(of = {"id", "address", "dogType", "executor", "bypassDate", "doneType"})
 @EqualsAndHashCode(of = {"id"})
 public class Bypass {
@@ -40,7 +41,8 @@ public class Bypass {
 
     @Column(name = "date_action")
     @JsonView(Views.BypassView.class)
-    //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    @JsonFormat(pattern = "dd-MM-yyyy HH:mm")
     private LocalDateTime bypassDate;
 
     @Column(name = "exec_vdgo")
