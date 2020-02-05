@@ -3,6 +3,7 @@ package com.vdgo.bypass.execvdgo.controller;
 import com.vdgo.bypass.execvdgo.domain.Executor;
 import com.vdgo.bypass.execvdgo.repo.BypassRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +18,9 @@ public class MainController
 {
     private final BypassRepo bypassRepo;
 
+    @Value("${spring.profiles.active}")
+    private String profile;
+
     @Autowired
     public MainController(BypassRepo bypassRepo) {
         this.bypassRepo = bypassRepo;
@@ -30,6 +34,7 @@ public class MainController
         data.put("bypasses", bypassRepo.findByExecutor(exec));
 
         model.addAttribute("frontendData", data);
+        model.addAttribute("isDevMode", "dev".equals(profile));
 
         return "index";
     }

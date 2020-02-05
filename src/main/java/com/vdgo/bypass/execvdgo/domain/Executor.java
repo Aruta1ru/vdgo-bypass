@@ -12,9 +12,9 @@ import java.util.Set;
 
 @Entity
 //for MSSQL connection
-@Table(name = "one_bso_user", catalog = "test_dog", schema = "dbo")
+//@Table(name = "one_bso_user", catalog = "test_dog", schema = "dbo")
 //for PostgreSQL connection
-//@Table(name = "one_bso_user")
+@Table(name = "one_bso_user")
 @ToString(of = {"id", "name", "post", "valid", "roles"})
 @EqualsAndHashCode(of = {"id"})
 public class Executor implements Serializable, UserDetails {
