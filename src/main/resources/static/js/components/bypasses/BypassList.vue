@@ -1,14 +1,14 @@
 
 <template>
-    <table style="width: 80%;">
-        <th style="border: 2px solid red;">ID</th>
-        <th style="border: 2px solid red;">Исполнитель</th>
-        <th style="border: 2px solid red;">Адрес</th>
-        <th style="border: 2px solid red;">Тип договора</th>
-        <th style="border: 2px solid red;">Дата обхода</th>
-        <th style="border: 2px solid red;">Статус выполнения</th>
-        <bypass-row v-for="bypass in bypasses" :key="bypass.id" :bypass="bypass" :bypasses="bypasses" />
-    </table>
+    <table class="table-bypass">
+            <th>ID</th>
+            <th>Исполнитель</th>
+            <th>Адрес</th>
+            <th>Тип договора</th>
+            <th>Дата обхода</th>
+            <th>Статус выполнения</th>
+            <bypass-row v-for="bypass in bypasses" :key="bypass.id" :bypass="bypass" :bypasses="bypasses" />
+     </table>
 </template>
 
 <script>
@@ -27,4 +27,20 @@
 </script>
 
 <style>
+
+/*Bypass Table - таблица данных */
+.table-bypass {
+border-collapse:separate;
+margin: auto;
+width:100%;
+font-size:17px;
+}
+
+.table-bypass th {
+border: 1px solid black;
+color:black;
+padding: 5px;
+font-family: Helios, sans-serif;
+}
+
 </style>

@@ -6,9 +6,28 @@
     <script th:inline="javascript">
         var frontendData = [[${frontendData}]];
     </script>
+    <style type="text/css">
+
+    /*Обертка основного интерфейса*/
+    * {
+        box-sizing: border-box;
+    }
+
+    .html, body {
+        margin:0;
+        padding:0;
+        background-image:
+        url(https://million-wallpapers.ru/wallpapers/3/41/543459494841954/abstraktnyj-fon.jpg);
+        background-size: cover;
+        background-repeat:no-repeat;
+        background-position:center;
+        background-attachment:fixed;
+    }
+
+    </style>
+
 </head>
 <body>
-    <h3>Выполнение ТО ВДГО</h3>
     <div id="app"></div>
     <script th:src="${isDevMode} ? 'http://localhost:8000/main.js' : '/js/main.js'"></script>
 </body>

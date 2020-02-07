@@ -1,13 +1,13 @@
 <template>
     <tr>
-         <td style="padding: 5px 3px; text-align: center;  border: 2px solid black;">{{ bypass.id }}</td>
-         <td style="padding: 5px 3px; text-align: left;  border: 2px solid black;">{{ bypass.executor.name }}</td>
-         <td style="padding: 5px 3px; text-align: left;  border: 2px solid black;">{{ bypass.address.addr }}</td>
-         <td style="padding: 5px 3px; text-align: center;  border: 2px solid black;">{{ bypass.dogType }}</td>
-         <td style="padding: 5px 3px; text-align: center;  border: 2px solid black;">{{ bypass.bypassDate }}</td>
-         <td style="padding: 5px 3px; text-align: center;  border: 2px solid black;">{{ bypass.doneType }}</td>
-         <td style="padding: 5px 3px; text-align: left;"><input type="button" value="Выполнено" @click="edit" /></td>
-    </tr>
+             <td style="text-align: center;">{{ bypass.id }}</td>
+             <td style="text-align: left;">{{ bypass.executor.name }}</td>
+             <td style="text-align: left;">{{ bypass.address.addr }}</td>
+             <td style="text-align: center;">{{ bypass.dogType }}</td>
+             <td style="text-align: center;">{{ bypass.bypassDate }}</td>
+             <td style="text-align: center;">{{ bypass.doneType }}</td>
+             <td style="text-align: center; margin:auto"><input type="button" class="buttonDone" value="Выполнено" @click="edit" /></td>
+     </tr>
 </template>
 
 <script>
@@ -39,4 +39,25 @@
 </script>
 
 <style>
+
+td {
+font-family: Helios, sans-serif;
+padding: 10px;
+border: 1px solid black;
+font-stretch: condensed;
+font-weight: bold;
+}
+
+tr:hover {
+    background: yellow; /* Цвет фона при наведении */
+    color: black; /* Цвет текста при наведении */
+   }
+
+.buttonDone {
+background-color:white;
+font-family:Helios,sans-serif;
+border: solid 1px black;
+padding:5px;
+}
+
 </style>
