@@ -18,7 +18,7 @@ public class MainController
 {
     private final BypassRepo bypassRepo;
 
-    @Value("${spring.profiles.active}")
+    @Value("${spring.profiles.active:prod}")
     private String profile;
 
     @Autowired
