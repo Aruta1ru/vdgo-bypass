@@ -15,7 +15,7 @@ import java.util.Set;
 @Table(name = "one_bso_user", catalog = "test_dog", schema = "dbo")
 //for PostgreSQL connection
 //@Table(name = "one_bso_user")
-@ToString(of = {"id", "name", "post", "valid", "roles"})
+@ToString(of = {"id", "name", "post", "valid"})
 @EqualsAndHashCode(of = {"id"})
 public class Executor implements Serializable, UserDetails {
 
