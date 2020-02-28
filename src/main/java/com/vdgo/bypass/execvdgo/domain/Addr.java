@@ -5,10 +5,9 @@ import jdk.nashorn.internal.ir.annotations.Immutable;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 //for MSSQL connection
@@ -29,6 +28,9 @@ public class Addr {
     @JsonView(Views.BypassView.class)
     private String addr;
 
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "address")
+    private List<FileStorage> files = new ArrayList<>();
+
     public int getId() {
         return id;
     }
@@ -36,4 +38,7 @@ public class Addr {
     public String getAddr() {
         return addr;
     }
+
+    public List<FileStorage> getFiles() { return files; }
+
 }

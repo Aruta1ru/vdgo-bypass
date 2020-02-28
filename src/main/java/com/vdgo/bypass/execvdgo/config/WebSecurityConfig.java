@@ -39,6 +39,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
         http
                 .antMatcher("/**")
                 .authorizeRequests()
+                // for API testing
+                //.antMatchers("/", "/bypass/62", "/files/obj-upload-multiple/**", "/files/obj-download/**", "/files/obj-upload/**", "/files/obj-delete/**", "/login**", "/js/**", "/error**").permitAll()
                 .antMatchers("/", "/login**", "/js/**", "/error**").permitAll()
                 .anyRequest().authenticated()
                 .and().formLogin().loginPage("/login")

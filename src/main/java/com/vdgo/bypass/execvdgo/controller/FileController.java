@@ -1,15 +1,20 @@
 package com.vdgo.bypass.execvdgo.controller;
 
-import com.vdgo.bypass.execvdgo.domain.FileResponse;
+import com.vdgo.bypass.execvdgo.domain.FileStorage;
+import com.vdgo.bypass.execvdgo.repo.FileStorageRepo;
 import com.vdgo.bypass.execvdgo.service.StorageService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.IOException;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,29 +24,25 @@ import java.util.stream.Collectors;
 public class FileController {
 
     private StorageService storageService;
+    private final JdbcTemplate jdbcTemplate;
 
-    public FileController(StorageService storageService) {
+    @Autowired
+    private FileStorageRepo fileStorageRepo;
+
+    public FileController(StorageService storageService, JdbcTemplate jdbcTemplate) {
         this.storageService = storageService;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
-    @GetMapping
-    public String listAllFiles(Model model) {
-
-        model.addAttribute("files", storageService.loadAll().map(
-                path -> ServletUriComponentsBuilder.fromCurrentContextPath()
-                        .path("/download/")
-                        .path(path.getFileName().toString())
-                        .toUriString())
-                .collect(Collectors.toList()));
-
-        return "listFiles";
-    }
-
-    @GetMapping("/download/{filename:.+}")
+    @GetMapping("/obj-download/{fileId:.+}")
     @ResponseBody
-    public ResponseEntity<Resource> downloadFile(@PathVariable String filename) {
+    public ResponseEntity<Resource> downloadFile(@PathVariable int fileId) {
 
-        Resource resource = storageService.loadAsResource(filename);
+        //TODO: Add NullPointerException Check
+        FileStorage fileStorage = fileStorageRepo.findById(fileId);
+
+        Resource resource = storageService
+                .loadAsResource(fileStorage.getName(), fileStorage.getAddress().getId());
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION,
@@ -49,24 +50,42 @@ public class FileController {
                 .body(resource);
     }
 
-    @PostMapping("/upload-file")
+    @PostMapping("/obj-upload/{objId:.+}")
     @ResponseBody
-    public FileResponse uploadFile(@RequestParam("file") MultipartFile file) {
-        String name = storageService.store(file);
+    public String uploadFile(@RequestParam("file") MultipartFile file, @PathVariable int objId) {
 
-        String uri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/download/")
-                .path(name)
-                .toUriString();
+        String name = storageService.store(file, objId);
 
-        return new FileResponse(name, uri, file.getContentType(), file.getSize());
+        GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(x -> {
+            PreparedStatement preparedStatement = x.prepareStatement("INSERT INTO vdg_obj_files (id_obj, name, size) VALUES (?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setInt(1, objId);
+            preparedStatement.setString(2, name);
+            preparedStatement.setLong(3, file.getSize());
+            return preparedStatement;
+        }, keyHolder);
+
+        return "Загружен файл " + name;
     }
 
-    @PostMapping("/upload-multiple-files")
+    @PostMapping("/obj-upload-multiple/{objId:.+}")
     @ResponseBody
-    public List<FileResponse> uploadMultipleFiles(@RequestParam("files") MultipartFile[] files) {
+    public List<String> uploadMultipleFiles(@RequestParam("files") MultipartFile[] files, @PathVariable int objId) {
         return Arrays.stream(files)
-                .map(file -> uploadFile(file))
+                .map(file -> uploadFile(file, objId))
                 .collect(Collectors.toList());
+    }
+
+    @DeleteMapping("/obj-delete/{fileId:.+}")
+    @ResponseBody
+    public String deleteFile(@PathVariable int fileId) throws IOException {
+
+        //TODO: Add NullPointerException Check
+        FileStorage fileStorage = fileStorageRepo.findById(fileId);
+
+        storageService.deleteOne(fileStorage.getName(), fileStorage.getAddress().getId());
+        fileStorageRepo.deleteById(fileId);
+
+        return "Удалён файл " + fileStorage.getName();
     }
 }
