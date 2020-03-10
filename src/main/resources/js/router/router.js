@@ -1,14 +1,12 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import BypassList from 'pages/BypassList.vue'
-import Analytics from 'pages/Analytics.vue'
+import Datatable from 'pages/Datatable.vue'
 
 Vue.use(VueRouter)
 
 const routes = [
-    { path: '/', component: BypassList },
-    { path: '/analytics', component: Analytics },
-   { path: '*', component: BypassList  }
+    { path: '*', component: Datatable },
+    { path: '/', component: Datatable}
 ]
 
 export default new VueRouter({

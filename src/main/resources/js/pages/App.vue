@@ -1,15 +1,15 @@
 <template>
     <v-app>
-    <v-app-bar app height=100 >
-    <img src="https://oblgaznnov.ru/images/logo.png" height=90/>
+    <v-app-bar v-if="profile" app height=80 >
+    <img src="https://oblgaznnov.ru/images/logo.png" height=70/>
     <v-spacer></v-spacer>
-   <span v-if="profile"> {{profile.name}} </span>
-    <v-btn  v-if="profile" icon href="/logout">
+   <span > {{profile.name}} </span>
+    <v-btn  icon href="/logout">
     <v-icon> exit_to_app </v-icon>
     </v-btn>
     <template v-slot:extension>
-            <v-tabs v-if="profile" align-with-title fixed tabs>
-             <v-tab to="/">  Заявки  </v-tab>
+            <v-tabs  fixed grow>
+             <v-tab to="/" >  Заявки  </v-tab>
             </v-tabs>
             </template>
     </v-app-bar>
@@ -28,14 +28,12 @@
 
 <script>
         import Login from 'pages/Login.vue'
-        import BypassList from 'pages/BypassList.vue'
-       import Analytics from 'pages/Analytics.vue'
+        import Datatable from 'pages/Datatable.vue'
 
         export default {
 
             components: {
-                   BypassList,
-                   Analytics,
+                   Datatable,
                    Login
             },
             data()  {

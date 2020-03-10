@@ -8,11 +8,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 public interface FileStorageRepo extends JpaRepository<FileStorage, Integer> {
-    List<FileStorage> findByAddress(Addr addr);
+
     FileStorage findById(int id);
+    FileStorage findFirstByAddressOrderByIdDesc(Addr addr);
 
     @Query(value = "DELETE from FileStorage f WHERE f.id=:id")
     @Modifying

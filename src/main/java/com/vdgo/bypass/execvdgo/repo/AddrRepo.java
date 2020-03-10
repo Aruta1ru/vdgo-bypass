@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AddrRepo extends JpaRepository<Addr, Integer> {
+    Addr findById(int id);
 }

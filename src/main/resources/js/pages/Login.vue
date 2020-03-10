@@ -1,21 +1,54 @@
 <template>
-<v-container>
-    <v-form id="app" action="/login"  method="post" >
 
-                   <v-col cols="12" md="4"  >
-                   <v-text-field outlined id="username" name="username" label="Имя пользователя">
-                   </v-text-field>
-                   </v-col>
+<v-container
+fluid
+fill-height >
 
-                   <v-col cols="12" md="4">
-                   <v-text-field outlined id="password" type="password" name="password" label="Пароль">
-                   <v-text-field type="hidden" name="csrf [${csrf.token}]"></v-text-field>
-                   </v-text-field>
-                   </v-col>
+        <v-layout
+          align-center
+          justify-center >
 
-                   <v-col  cols="12" md="4">
-                   <v-btn type="submit" >Вход</v-btn>
-                   </v-col>
-        </v-form>
-       </v-container>
+          <v-flex xs12 sm8 md4>
+            <v-card  class="elevation-10">
+              <v-toolbar light flat >
+              <img src="https://oblgaznnov.ru/images/logo.png" height=50/>
+              </v-toolbar>
+
+              <v-card-text>
+                <v-form
+                 id="app" action="/login"  method="post">
+
+                  <v-text-field
+                  id="username"
+                    label="Имя пользователя"
+                    name="username"
+                    prepend-icon="person"
+                    type="text">
+                  </v-text-field>
+
+                  <v-text-field
+                    id="password"
+                    label="Пароль"
+                    name="password"
+                    prepend-icon="lock"
+                    type="password" >
+                  <v-text-field
+                  type="hidden"
+                  name="csrf [${csrf.token}]">
+                  </v-text-field>
+                  </v-text-field>
+
+                <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="primary" type="submit" > Войти </v-btn>
+              </v-card-actions>
+                </v-form>
+              </v-card-text>
+
+            </v-card>
+          </v-flex>
+        </v-layout>
+      </v-container>
+
 </template>
+
