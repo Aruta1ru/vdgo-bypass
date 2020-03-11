@@ -1,17 +1,12 @@
 <template>
     <v-app>
-    <v-app-bar v-if="profile" app height=80 >
+    <v-app-bar app dense fixed height=80 v-if="profile" >
     <img src="https://oblgaznnov.ru/images/logo.png" height=70/>
     <v-spacer></v-spacer>
    <span > {{profile.name}} </span>
-    <v-btn  icon href="/logout">
+    <v-btn color="primary" icon href="/logout">
     <v-icon> exit_to_app </v-icon>
     </v-btn>
-    <template v-slot:extension>
-            <v-tabs  fixed grow>
-             <v-tab to="/" >  Заявки  </v-tab>
-            </v-tabs>
-            </template>
     </v-app-bar>
 
     <v-content>

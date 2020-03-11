@@ -6,23 +6,32 @@
     :single-expand="singleExpand"
     :expanded.sync="expanded"
     :search="search"
+    @click:row="expandRow"
     item-key="id"
     class="elevation-1"
     show-expand
     hide-default-footer
-   disable-pagination
+    disable-pagination
   >
     <template v-slot:top>
       <v-toolbar flat>
-         <v-text-field
-                v-model="search"
-                append-icon="search"
-                label="Поиск"
-                single-line
-                hide-details
-             >
-              </v-text-field>
-        <v-spacer></v-spacer>
+<v-toolbar-title > Заявки </v-toolbar-title>
+<v-divider
+          class="mx-4"
+          inset
+          vertical
+        ></v-divider>
+    <v-spacer> </v-spacer>
+     <v-text-field
+                          v-model="search"
+                          append-icon="search"
+                          label="Поиск"
+                          single-line
+                          hide-details
+                          class="mx-5"
+
+                        >
+                        </v-text-field>
       </v-toolbar>
     </template>
 
@@ -37,21 +46,26 @@
 
          <v-divider> </v-divider>
 
-<v-container v-if="item.fileList.length > 0">
+     <v-container v-if="item.fileList.length > 0">
 
-                 <v-container v-for="file in item.fileList" :key="file.id">
+     <v-container v-for="file in item.fileList" :key="file.id" >
 
                  <table>
 
-                 <td width="auto"> <h4> {{ file.name }}  {{ parseFloat(file.size/1024).toFixed(2) }} КБайт </h4> </td>
+                 <td width="auto">
+                 <h4> {{ file.name }}  {{ parseFloat(file.size/1024).toFixed(2) }} КБайт </h4>
+                 </td>
 
-                 <td width="40px"> <v-btn small color="primary" @click=downloadFile(file)>
+                 <td width="40px">
+                 <v-btn small color="primary" @click=downloadFile(file)>
                        <v-icon> cloud_download </v-icon>
-                                  </v-btn></td>
+                       </v-btn>
+                       </td>
 
                  <td width="40px" > <v-btn small color="red" @click=deleteFile(file.id)>
                 <v-icon> delete  </v-icon>
-                 </v-btn> </td>
+                 </v-btn>
+                 </td>
                  </table>
                  </v-container>
                  </v-container>
@@ -60,10 +74,10 @@
 
   <v-container>
                    <v-row>
-                   <v-flex  xs10
+                   <v-flex  xs11
                             sm7
-                            md4
->
+                            md4  >
+
                   <v-file-input
                       v-model="files"
                       color="primary"
@@ -75,6 +89,7 @@
                       outlined
                       :show-size="1000"
                     >
+
                       <template v-slot:selection="{ index, text }">
                         <v-chip
                           v-if="index < 2"
@@ -90,16 +105,16 @@
                           v-else-if="index === 2"
                           class="overline grey--text text--darken-3 mx-2"
                         >
-                          +{{ files.length - 2 }} Файл(ов)
+                          + {{ files.length - 2 }} Файл(ов)
                         </span>
                       </template>
                     </v-file-input>
 
                     </v-flex>
- <v-flex  xs5
+
+                    <v-flex xs5
                             sm6
-                            md3
->
+                            md3>
                     <v-col>
                      <v-btn small color="primary" @click="uploadFiles(item)">
                      <v-icon>cloud_upload</v-icon>
@@ -108,12 +123,7 @@
                      </v-flex>
                      </v-row>
                     </v-container>
-
-
-
-
     </td>
-
         </template>
 
     <template v-slot:item.doneType="{ item }">
@@ -133,7 +143,7 @@
 <script>
 
   function getIndex(list, id) {
-              for (let i = 0; i < list.length; i++ ) {
+              for (var i = 0; i < list.length; i++ ) {
                   if (list[i].id === id) {
                       return i
                   }
@@ -142,11 +152,11 @@
           }
 
   function findIndexByFileId(list, id) {
-              let indexes = {};
+              var indexes = {};
               if (list.length > 0) {
-              for (let i = 0; i < list.length; i++) {
+              for (var i = 0; i < list.length; i++) {
                   if (list[i].fileList.length > 0) {
-                  for (let j = 0; j < list[i].fileList.length; j++) {
+                  for (var j = 0; j < list[i].fileList.length; j++) {
                             if (list[i].fileList[j].id === id) {
                                 indexes.rowIndex = i;
                                 indexes.fileIndex = j;
@@ -160,13 +170,13 @@
   }
 
   function    getTableData(list) {
-                      let moment = require('moment');
-                      let bpDate = '';
-                      let arr = {};
+                      var moment = require('moment');
+                      var bpDate = '';
+                      var arr = {};
                       moment.locale('ru');
 
-                      let tableList = [];
-                      for (let i = 0; i < list.length; i++ ) {
+                      var tableList = [];
+                      for (var i = 0; i < list.length; i++ ) {
                         bpDate = moment(list[i].bypassDate, 'DD-MM-YYYY HH:mm:ss');
 
                            arr.id=list[i].id;
@@ -184,7 +194,7 @@
                       }
 
    function    findOne(list, id) {
-   for (let i = 0; i < list.length; i++ ) {
+   for (var i = 0; i < list.length; i++ ) {
         if (list[i].id === id) {
                               return list[i]
                           }
@@ -193,7 +203,7 @@
    }
 
    function getFileInfo(data) {
-   let arr = {};
+   var arr = {};
         arr.id = data.id;
         arr.name = data.name;
         arr.size = data.size;
@@ -232,12 +242,12 @@
             else return 'green'
           },
           getBtnStatus (doneType) {
-           if (doneType === 'не выполнено') return false
+            if (doneType === 'не выполнено') return false
                         else return true
           },
           setExec(item) {
 
-                                let bypass = frontendData.bypasses[getIndex(frontendData.bypasses, item.id)];
+                                var bypass = frontendData.bypasses[getIndex(frontendData.bypasses, item.id)];
                                   this.$resource('/bypass{/id}').update({id: bypass.id}, {executor: bypass.executor,
                                                   address: bypass.address, dogType: bypass.dogType,
                                                   bypassDate: bypass.bypassDate, doneType: 1}).then(result =>
@@ -261,7 +271,7 @@
                 deleteFile(fId) {
                             this.$resource('/files/obj-delete{/fileId}').delete({fileId: fId});
                             // TODO Add status.ok condition
-                            let arr = findIndexByFileId(this.bypassRows, fId);
+                            var arr = findIndexByFileId(this.bypassRows, fId);
                             this.bypassRows[arr.rowIndex].fileList.splice(arr.fileIndex, 1);
                       },
 
@@ -277,19 +287,20 @@
                                                 result.json().then(data => {
 
                                                 const indexTable = this.bypassRows.indexOf(item);
-                                                for (let i = 0; i < data.length; i++) {
-                                                let arr = getFileInfo(data[i]);
+                                                for (var i = 0; i < data.length; i++) {
+                                                var arr = getFileInfo(data[i]);
                                                 this.bypassRows[indexTable].fileList.push(arr);
                                                    }
                                                 }));
                                      this.files = [];
                                      // TODO Add status.ok condition
-
-
                  }
-                 }
+                 },
+
+                 expandRow (item) {
+                                   this.expanded = item === this.expanded[0] ? [] : [item]
+                                 }
         }
   }
 </script>
-
 
