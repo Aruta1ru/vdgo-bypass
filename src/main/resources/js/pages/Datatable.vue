@@ -42,6 +42,9 @@
          <v-row> ID : {{item.id}} </v-row>
          <v-row> Тип договора: {{item.dogType}} </v-row>
          <v-row> Дата обхода: {{ item.bypassDate}} </v-row>
+         <v-divider> </v-divider>
+         <v-row> ФИО абонента: {{item.clientInfo.name}} </v-row>
+         <v-row> Телефон: {{ item.clientInfo.phone }} </v-row>
          </v-container>
 
          <v-divider> </v-divider>
@@ -143,7 +146,7 @@
 <script>
 
   function getIndex(list, id) {
-              for (var i = 0; i < list.length; i++ ) {
+              for (let i = 0; i < list.length; i++ ) {
                   if (list[i].id === id) {
                       return i
                   }
@@ -152,11 +155,11 @@
           }
 
   function findIndexByFileId(list, id) {
-              var indexes = {};
+              let indexes = {};
               if (list.length > 0) {
-              for (var i = 0; i < list.length; i++) {
+              for (let i = 0; i < list.length; i++) {
                   if (list[i].fileList.length > 0) {
-                  for (var j = 0; j < list[i].fileList.length; j++) {
+                  for (let j = 0; j < list[i].fileList.length; j++) {
                             if (list[i].fileList[j].id === id) {
                                 indexes.rowIndex = i;
                                 indexes.fileIndex = j;
@@ -170,13 +173,13 @@
   }
 
   function    getTableData(list) {
-                      var moment = require('moment');
-                      var bpDate = '';
-                      var arr = {};
+                      let moment = require('moment');
+                      let bpDate = '';
+                      let arr = {};
                       moment.locale('ru');
 
-                      var tableList = [];
-                      for (var i = 0; i < list.length; i++ ) {
+                      let tableList = [];
+                      for (let i = 0; i < list.length; i++ ) {
                         bpDate = moment(list[i].bypassDate, 'DD-MM-YYYY HH:mm:ss');
 
                            arr.id=list[i].id;
@@ -185,7 +188,9 @@
                            arr.doneType=list[i].doneType;
                            arr.dogType=list[i].dogType;
                            arr.objectId=list[i].address.id;
+                           arr.clientInfo=list[i].address.client;
                            arr.fileList=list[i].address.files;
+
                         tableList.push(arr);
                         arr = {};
                       }
@@ -194,7 +199,7 @@
                       }
 
    function    findOne(list, id) {
-   for (var i = 0; i < list.length; i++ ) {
+   for (let i = 0; i < list.length; i++ ) {
         if (list[i].id === id) {
                               return list[i]
                           }
@@ -203,7 +208,7 @@
    }
 
    function getFileInfo(data) {
-   var arr = {};
+   let arr = {};
         arr.id = data.id;
         arr.name = data.name;
         arr.size = data.size;
@@ -237,17 +242,18 @@
     },
     methods: {
 
-          getColor (doneType) {
-            if (doneType === 'не выполнено') return 'red'
-            else return 'green'
-          },
-          getBtnStatus (doneType) {
-            if (doneType === 'не выполнено') return false
-                        else return true
-          },
-          setExec(item) {
+                getColor (doneType) {
+                    if (doneType === 'не выполнено') return 'red'
+                    else return 'green'
+                },
 
-                                var bypass = frontendData.bypasses[getIndex(frontendData.bypasses, item.id)];
+                getBtnStatus (doneType) {
+                    if (doneType === 'не выполнено') return false
+                        else return true
+                },
+
+                setExec(item) {
+                                let bypass = frontendData.bypasses[getIndex(frontendData.bypasses, item.id)];
                                   this.$resource('/bypass{/id}').update({id: bypass.id}, {executor: bypass.executor,
                                                   address: bypass.address, dogType: bypass.dogType,
                                                   bypassDate: bypass.bypassDate, doneType: 1}).then(result =>
@@ -257,49 +263,40 @@
 
                                           const indexTable = this.bypassRows.indexOf(item);
                                           this.bypassRows.splice(indexTable, 1, findOne(getTableData(frontendData.bypasses), data.id));
-
                                       })
                                   );
-
                              },
 
-               downloadFile(file) {
-                window.location.href = '/files/obj-download/'+ file.id;
-
-               },
+                downloadFile(file) {window.location.href = '/files/obj-download/'+ file.id;},
 
                 deleteFile(fId) {
-                            this.$resource('/files/obj-delete{/fileId}').delete({fileId: fId});
-                            // TODO Add status.ok condition
-                            var arr = findIndexByFileId(this.bypassRows, fId);
+                            this.$resource('/files/obj-delete{/fileId}').delete({fileId: fId}).then(result => {
+                            if (result.ok) {
+                            let arr = findIndexByFileId(this.bypassRows, fId);
                             this.bypassRows[arr.rowIndex].fileList.splice(arr.fileIndex, 1);
+                            }
+                            })
                       },
 
-                 uploadFiles(item) {
+                uploadFiles(item) {
                             if (this.files) {
-                                    let formData = new FormData();
-
-                                    // files
-                                    for (let file of this.files) {
-                                        formData.append("files", file, file.name);
-                                    }
+                                     let formData = new FormData();
+                                     for (let file of this.files) {formData.append("files", file, file.name);}
                                      this.$resource('/files/obj-upload-multiple{/objId}').save({objId: item.objectId}, formData).then(result =>
+                                     {if (result.ok) {
                                                 result.json().then(data => {
-
                                                 const indexTable = this.bypassRows.indexOf(item);
-                                                for (var i = 0; i < data.length; i++) {
-                                                var arr = getFileInfo(data[i]);
+                                                for (let i = 0; i < data.length; i++) {
+                                                let arr = getFileInfo(data[i]);
                                                 this.bypassRows[indexTable].fileList.push(arr);
                                                    }
-                                                }));
+                                                })}});
                                      this.files = [];
-                                     // TODO Add status.ok condition
+
                  }
                  },
 
-                 expandRow (item) {
-                                   this.expanded = item === this.expanded[0] ? [] : [item]
-                                 }
+                expandRow (value) {this.expanded = value === this.expanded[0] ? [] : [value]}
         }
   }
 </script>

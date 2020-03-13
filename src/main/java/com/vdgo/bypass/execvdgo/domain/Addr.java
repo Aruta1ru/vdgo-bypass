@@ -31,6 +31,9 @@ public class Addr {
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "address")
     private List<FileStorage> files = new ArrayList<>();
 
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "address")
+    private Client client;
+
     public int getId() {
         return id;
     }
@@ -41,4 +44,7 @@ public class Addr {
 
     public List<FileStorage> getFiles() { return files; }
 
+    public Client getClient() {
+        return client;
+    }
 }
