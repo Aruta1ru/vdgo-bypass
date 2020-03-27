@@ -44,7 +44,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
                 .antMatchers("/", "/login**", "/js/**", "/error**").permitAll()
                 .anyRequest().authenticated()
                 .and().formLogin().loginPage("/login")
-                .defaultSuccessUrl("/").failureUrl("/login?error").permitAll()
+                .defaultSuccessUrl("/")
+                .failureUrl("/login").permitAll()
                 .and().logout().logoutSuccessUrl("/").permitAll()
                 .and()
                 .csrf().disable();

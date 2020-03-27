@@ -1,8 +1,8 @@
 <template>
 
-<v-container
-fluid
-fill-height >
+ <v-container
+ fluid
+ fill-height >
 
         <v-layout
           align-center
@@ -19,24 +19,25 @@ fill-height >
                  id="app" action="/login"  method="post">
 
                   <v-text-field
-                  id="username"
-                    label="Имя пользователя"
+                    id="username"
                     name="username"
-                    prepend-icon="person"
+                    :prepend-icon="account"
+                    placeholder="Имя пользователя"
                     type="text">
                   </v-text-field>
 
                   <v-text-field
                     id="password"
-                    label="Пароль"
+                    placeholder="Пароль"
                     name="password"
-                    prepend-icon="lock"
+                    autocomplete="on"
+                    :prepend-icon= "lock"
                     type="password" >
-                  <v-text-field
-                  type="hidden"
-                  name="csrf [${csrf.token}]">
-                  </v-text-field>
-                  </v-text-field>
+                    <v-text-field
+                    type="hidden"
+                    name="csrf [${csrf.token}]">
+                    </v-text-field>
+                    </v-text-field>
 
                 <v-card-actions>
                 <v-spacer></v-spacer>
@@ -44,7 +45,6 @@ fill-height >
               </v-card-actions>
                 </v-form>
               </v-card-text>
-
             </v-card>
           </v-flex>
         </v-layout>
@@ -52,3 +52,15 @@ fill-height >
 
 </template>
 
+<script>
+import {mdiLock, mdiAccount} from '@mdi/js'
+
+export default {
+        data () {
+             return {
+           lock: mdiLock ,
+           account: mdiAccount
+               }
+               }
+               }
+</script>

@@ -6,14 +6,14 @@ import com.fasterxml.jackson.annotation.JsonView;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "vdg_obj_files", catalog = "tmp_to_ch_dog", schema = "dbo")
+@Table(name = "web_vdgo_files", catalog = "to_ch_dog", schema = "dbo")
 public class FileStorage {
 
     @Id
     @JsonView(Views.BypassView.class)
     private int id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_obj")
     @JsonIgnore
     private Addr address;

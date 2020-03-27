@@ -77,7 +77,6 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     public Path load(String filename, int objId) {
-
         Path newLocation = Paths.get(this.rootLocation+"/"+objId);
         return newLocation.resolve(filename);
     }

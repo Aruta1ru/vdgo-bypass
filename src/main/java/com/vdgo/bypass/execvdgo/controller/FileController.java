@@ -4,6 +4,7 @@ import com.vdgo.bypass.execvdgo.domain.FileStorage;
 import com.vdgo.bypass.execvdgo.repo.AddrRepo;
 import com.vdgo.bypass.execvdgo.repo.FileStorageRepo;
 import com.vdgo.bypass.execvdgo.service.StorageService;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.Arrays;
@@ -34,9 +36,20 @@ public class FileController {
     @Autowired
     private AddrRepo addrRepo;
 
+
     public FileController(StorageService storageService, JdbcTemplate jdbcTemplate) {
         this.storageService = storageService;
         this.jdbcTemplate = jdbcTemplate;
+    }
+
+    @GetMapping(
+            value = "{id}",
+            produces = MediaType.IMAGE_JPEG_VALUE
+    )
+    public @ResponseBody byte[] getImage(@PathVariable("id") FileStorage file) throws IOException {
+        InputStream in = getClass()
+                .getResourceAsStream(storageService.load(file.getName(), file.getAddress().getId()).toString());
+        return IOUtils.toByteArray(in);
     }
 
     @GetMapping("/obj-download/{fileId:.+}")

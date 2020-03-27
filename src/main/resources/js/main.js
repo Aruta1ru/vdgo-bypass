@@ -1,17 +1,16 @@
 import Vue from 'vue'
-import VueResource from 'vue-resource'
-import App from 'pages/App.vue'
 import Vuetify from 'vuetify'
-import 'vuetify/dist/vuetify.min.css'
+import '@babel/polyfill'
+import 'api/resource'
+import App from 'pages/App.vue'
+import store from 'store/store'
+import vuetify from 'plugins/vuetify'
 import router from 'router/router'
 
-Vue.use(VueResource)
-Vue.use(Vuetify)
-
-
 new Vue({
-    vuetify : new Vuetify(),
+    vuetify,
     router,
+    store,
     el: '#app',
     render: a => a(App)
 })

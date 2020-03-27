@@ -19,6 +19,7 @@ module.exports = {
         test: /\.vue$/,
         loader: 'vue-loader'
       },
+
       {
               test: /\.css$/,
               use: [
@@ -28,6 +29,7 @@ module.exports = {
       }
     ]
   },
+
   plugins: [
     new VueLoaderPlugin()
   ],

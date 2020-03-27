@@ -1,5 +1,30 @@
 <template>
 <v-container>
+    <v-dialog v-model="dialog"  scrollable max-width="300px">
+      <v-card>
+        <v-card-title>Укажите причину</v-card-title>
+        <v-divider></v-divider>
+        <v-card-text style="height: 300px;">
+          <v-radio-group v-model="dialogm1" column>
+            <v-radio label="Нет дома"></v-radio>
+            <v-radio label="Не пустили"></v-radio>
+            <v-radio label="Газ отключен"></v-radio>
+            <v-radio label="Нет денег для оплаты работ"></v-radio>
+            <v-radio label="Нет доступа к газопроводу, газоиспользующему оборудованию"></v-radio>
+            <v-radio label="Несоответствие оборудования, указанному в договоре"></v-radio>
+            <v-radio label="Смена абонента"></v-radio>
+            <v-radio label="Неадекватный абонент"></v-radio>
+            <v-radio label="Отсутствие собственника (нанимателя) на объекте"></v-radio>
+          </v-radio-group>
+          </v-card-text>
+        <v-divider></v-divider>
+                <v-card-actions>
+                  <v-btn color="primary" text @click="dialog = false">Сохранить</v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+      </v-dialog>
+
   <v-data-table
     :headers="headers"
     :items="bypassRows"
@@ -9,10 +34,10 @@
     @click:row="expandRow"
     item-key="id"
     class="elevation-1"
-    show-expand
     hide-default-footer
     disable-pagination
   >
+
     <template v-slot:top>
       <v-toolbar flat>
 <v-toolbar-title > Заявки </v-toolbar-title>
@@ -24,12 +49,11 @@
     <v-spacer> </v-spacer>
      <v-text-field
                           v-model="search"
-                          append-icon="search"
+                          :append-icon="searchIcon"
                           label="Поиск"
                           single-line
                           hide-details
                           class="mx-5"
-
                         >
                         </v-text-field>
       </v-toolbar>
@@ -39,34 +63,33 @@
     <td :colspan="headers.length">
 
     <v-container>
-         <v-row> ID : {{item.id}} </v-row>
-         <v-row> Тип договора: {{item.dogType}} </v-row>
-         <v-row> Дата обхода: {{ item.bypassDate}} </v-row>
-         <v-divider> </v-divider>
-         <v-row> ФИО абонента: {{item.clientInfo.name}} </v-row>
-         <v-row> Телефон: {{ item.clientInfo.phone }} </v-row>
+    <table>
+    <tr> <th> ID </th> <td> {{item.id}} </td> </tr>
+    <tr> <th> Дата обхода </th> <td> {{ item.bypassDate}} </td> </tr>
+    <tr> <th> ФИО абонента </th> <td> {{item.clientInfo.name}} </td> </tr>
+    <tr> <th> Телефон </th> <td> {{ item.clientInfo.phone }} </td> </tr>
+    <tr> <th> Тип договора </th> <td> {{item.dogType}} </td> </tr>
+    </table>
          </v-container>
 
          <v-divider> </v-divider>
 
      <v-container v-if="item.fileList.length > 0">
-
      <v-container v-for="file in item.fileList" :key="file.id" >
 
                  <table>
-
                  <td width="auto">
                  <h4> {{ file.name }}  {{ parseFloat(file.size/1024).toFixed(2) }} КБайт </h4>
                  </td>
 
-                 <td width="40px">
+                 <td width="35px">
                  <v-btn small color="primary" @click=downloadFile(file)>
-                       <v-icon> cloud_download </v-icon>
+                       <v-icon> {{downloadIcon}} </v-icon>
                        </v-btn>
                        </td>
 
-                 <td width="40px" > <v-btn small color="red" @click=deleteFile(file.id)>
-                <v-icon> delete  </v-icon>
+                 <td width="35px" > <v-btn small color="red" @click=deleteFile(file.id)>
+                <v-icon> {{deleteIcon}}  </v-icon>
                  </v-btn>
                  </td>
                  </table>
@@ -75,57 +98,27 @@
 
          <v-divider> </v-divider>
 
-  <v-container>
-                   <v-row>
-                   <v-flex  xs11
-                            sm7
-                            md4  >
+ <v-container>
+ <v-row>
+                    <v-flex  xs11
+                             sm7
+                             md4  >
 
-                  <v-file-input
-                      v-model="files"
-                      color="primary"
-                      counter
-                      label="Приложить файлы"
-                      multiple
-                      placeholder="Выберите файлы"
-                      prepend-icon="mdi-paperclip"
-                      outlined
-                      :show-size="1000"
-                    >
-
-                      <template v-slot:selection="{ index, text }">
-                        <v-chip
-                          v-if="index < 2"
-                          color="primary"
-                          dark
-                          label
-                          x-small
-                        >
-                          {{ text }}
-                        </v-chip>
-
-                        <span
-                          v-else-if="index === 2"
-                          class="overline grey--text text--darken-3 mx-2"
-                        >
-                          + {{ files.length - 2 }} Файл(ов)
-                        </span>
-                      </template>
-                    </v-file-input>
-
-                    </v-flex>
-
-                    <v-flex xs5
-                            sm6
-                            md3>
-                    <v-col>
-                     <v-btn small color="primary" @click="uploadFiles(item)">
-                     <v-icon>cloud_upload</v-icon>
-                     </v-btn>
-                     </v-col>
+                      <v-file-input
+                       v-model="files"
+                       color="primary"
+                       multiple
+                       placeholder="Выберите файлы"
+                       :prepend-icon="attachFilesIcon"
+                       outlined
+                       dense
+                       accept="image/*"
+                       @change="uploadFiles(item)"
+                     >
+                     </v-file-input>
                      </v-flex>
                      </v-row>
-                    </v-container>
+ </v-container>
     </td>
         </template>
 
@@ -133,12 +126,17 @@
           <v-chip :color="getColor(item.doneType)" dark>{{ item.doneType }}</v-chip>
         </template>
 
-    <template v-slot:item.action="{ item }">
-              <v-btn :disabled=getBtnStatus(item.doneType) small color="primary" @click=setExec(item)>
-                        <v-icon>done</v-icon>
+    <template v-slot:item.actionDone="{ item }">
+              <v-btn :disabled=getBtnStatus(item.doneType) small color="primary" @click.native.stop=setExec(item)>
+                        <v-icon>{{doneIcon}}</v-icon>
               </v-btn>
-    </template>
+              </template>
 
+      <template v-slot:item.actionUndone="{ item }">
+                   <v-btn :disabled=getBtnStatus(item.doneType) small color="red" @click.native.stop ="dialog = true">
+                             <v-icon>{{undoneIcon }}</v-icon>
+                   </v-btn>
+                   </template>
   </v-data-table>
   </v-container>
 </template>
@@ -153,6 +151,15 @@
               }
               return -1
           }
+
+          function    findOne(list, id) {
+             for (let i = 0; i < list.length; i++ ) {
+                  if (list[i].id === id) {
+                                        return list[i]
+                                    }
+                                }
+                                return null;
+             }
 
   function findIndexByFileId(list, id) {
               let indexes = {};
@@ -172,6 +179,14 @@
               return null;
   }
 
+  function getFileInfo(data) {
+     let arr = {};
+          arr.id = data.id;
+          arr.name = data.name;
+          arr.size = data.size;
+     return arr;
+     }
+
   function    getTableData(list) {
                       let moment = require('moment');
                       let bpDate = '';
@@ -185,7 +200,7 @@
                            arr.id=list[i].id;
                            arr.address= list[i].address.addr;
                            arr.bypassDate= bpDate.format('DD MMMM YYYY');
-                           arr.doneType=list[i].doneType;
+                           arr.doneType=list[i].doneType ? "выполнено" : "не выполнено";
                            arr.dogType=list[i].dogType;
                            arr.objectId=list[i].address.id;
                            arr.clientInfo=list[i].address.client;
@@ -198,44 +213,31 @@
                         return tableList;
                       }
 
-   function    findOne(list, id) {
-   for (let i = 0; i < list.length; i++ ) {
-        if (list[i].id === id) {
-                              return list[i]
-                          }
-                      }
-                      return null;
-   }
-
-   function getFileInfo(data) {
-   let arr = {};
-        arr.id = data.id;
-        arr.name = data.name;
-        arr.size = data.size;
-   return arr;
-   }
-
-
+import bypassesApi from 'api/bypasses'
+import removeFilesApi from 'api/removeFiles'
+import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiDelete, mdiCheck, mdiPaperclip,  mdiClose} from '@mdi/js'
   export default {
-    props: ['bypasses'],
     data () {
       return {
+        searchIcon: mdiMagnify,
+        cloudUploadIcon: mdiCloudUpload,
+        downloadIcon: mdiCloudDownload,
+        deleteIcon: mdiDelete,
+        doneIcon: mdiCheck,
+        undoneIcon: mdiClose,
+        attachFilesIcon: mdiPaperclip,
         expanded: [],
         files: [],
         search: '',
+        dialogm1: '',
+        dialog: false,
         singleExpand: true,
         headers: [
-          {
-            text: 'ID',
-            align: 'start',
-            sortable: false,
-            value: 'id',
-          },
           { text: 'Адрес', value: 'address' },
           { text: 'Дата обхода', value: 'bypassDate' },
           { text: 'Статус выполнения', value: 'doneType' },
-          { text: '', value: 'action', sortable: false },
-          { text: '', value: 'data-table-expand' },
+          { text: '', value: 'actionDone', sortable: false },
+          { text: '', value: 'actionUndone', sortable: false }
         ],
         bypassRows: getTableData(frontendData.bypasses),
       }
@@ -254,23 +256,20 @@
 
                 setExec(item) {
                                 let bypass = frontendData.bypasses[getIndex(frontendData.bypasses, item.id)];
-                                  this.$resource('/bypass{/id}').update({id: bypass.id}, {executor: bypass.executor,
-                                                  address: bypass.address, dogType: bypass.dogType,
-                                                  bypassDate: bypass.bypassDate, doneType: 1}).then(result =>
+                                 bypassesApi.done(bypass).then(result =>
                                       result.json().then(data => {
                                           const index = getIndex(frontendData.bypasses, data.id)
                                           frontendData.bypasses.splice(index, 1, data);
-
                                           const indexTable = this.bypassRows.indexOf(item);
                                           this.bypassRows.splice(indexTable, 1, findOne(getTableData(frontendData.bypasses), data.id));
                                       })
                                   );
                              },
 
-                downloadFile(file) {window.location.href = '/files/obj-download/'+ file.id;},
+                downloadFile(file) { window.location.href = '/files/obj-download/'+ file.id;},
 
                 deleteFile(fId) {
-                            this.$resource('/files/obj-delete{/fileId}').delete({fileId: fId}).then(result => {
+                            removeFilesApi.delete(fId).then(result => {
                             if (result.ok) {
                             let arr = findIndexByFileId(this.bypassRows, fId);
                             this.bypassRows[arr.rowIndex].fileList.splice(arr.fileIndex, 1);
@@ -290,14 +289,21 @@
                                                 let arr = getFileInfo(data[i]);
                                                 this.bypassRows[indexTable].fileList.push(arr);
                                                    }
-                                                })}});
+                                                }
+                                                )
+                                                }
+                                                }
+                                                );
                                      this.files = [];
 
                  }
                  },
 
                 expandRow (value) {this.expanded = value === this.expanded[0] ? [] : [value]}
+                    }
         }
-  }
 </script>
 
+<style>
+
+<style>
