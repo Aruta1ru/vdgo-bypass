@@ -4,8 +4,9 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum BypassDoneTypeEnum {
 
-    UNDONE( "не выполнено"),
-    DONE("выполнено");
+    INWORK( "в работе"),
+    DONE("выполнено"),
+    UNDONE( "не выполнено");
 
     private String name;
 

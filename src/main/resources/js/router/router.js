@@ -1,15 +1,16 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Datatable from 'pages/Datatable.vue'
+import DataTable from 'pages/DataTable.vue'
 
 Vue.use(VueRouter)
 
 const routes = [
-    { path: '*', component: Datatable },
-    { path: '/', component: Datatable}
+    { path: '/', component: DataTable },
+   { path: '*', component:  DataTable  }
+
 ]
 
 export default new VueRouter({
- mode: 'history',
+mode: 'history',
  routes
 })

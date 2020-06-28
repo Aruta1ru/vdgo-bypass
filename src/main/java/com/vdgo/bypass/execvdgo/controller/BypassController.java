@@ -4,14 +4,17 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.vdgo.bypass.execvdgo.domain.Bypass;
 import com.vdgo.bypass.execvdgo.domain.Executor;
 import com.vdgo.bypass.execvdgo.domain.Views;
+import com.vdgo.bypass.execvdgo.dto.BuffTableObject;
 import com.vdgo.bypass.execvdgo.repo.BypassRepo;
 import com.vdgo.bypass.execvdgo.service.ExecutorService;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.sql.PreparedStatement;
 import java.util.List;
 
 @RestController
@@ -19,13 +22,15 @@ import java.util.List;
 public class BypassController {
 
     private final BypassRepo bypassRepo;
+    private final JdbcTemplate jdbcTemplate;
 
     @Autowired
     private ExecutorService executorService;
 
     @Autowired
-    public BypassController(BypassRepo bypassRepo) {
+    public BypassController(BypassRepo bypassRepo, JdbcTemplate jdbcTemplate) {
         this.bypassRepo = bypassRepo;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @GetMapping
@@ -44,9 +49,34 @@ public class BypassController {
         return bypass;
     }
 
-    @PutMapping("{id}")
-    public Bypass update(@PathVariable("id") Bypass bypassFromDb, @RequestBody Bypass bypass) {
-        BeanUtils.copyProperties(bypass, bypassFromDb, "id");
-        return bypassRepo.save(bypassFromDb);
+    @PostMapping("{id}")
+    public Bypass save(@PathVariable("id") int bypassId, @RequestBody BuffTableObject buffTableObject) {
+        GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
+        if (buffTableObject.isCreated())
+        {
+            jdbcTemplate.update(x -> {
+                PreparedStatement preparedStatement = x.prepareStatement("UPDATE web_vdgo_buff_data SET exec_vdgo=?, undone_reason=? WHERE id_bypass=?");
+                preparedStatement.setInt(1, buffTableObject.getDoneType());
+                preparedStatement.setInt(2, buffTableObject.getUndoneReason());
+                preparedStatement.setInt(3, bypassId);
+                return preparedStatement;
+            }, keyHolder);}
+        else {
+            jdbcTemplate.update(x -> {
+                PreparedStatement preparedStatement = x.prepareStatement("INSERT INTO web_vdgo_buff_data (id_bypass, id_obj, id_exec, date_action, exec_vdgo, undone_reason) VALUES (?, ?, ?, ?, ?, ?)");
+                preparedStatement.setInt(1, bypassId);
+                preparedStatement.setInt(2, buffTableObject.getIdObject());
+                preparedStatement.setInt(3, buffTableObject.getIdExecutor());
+                preparedStatement.setObject(4, buffTableObject.getDateAction());
+                preparedStatement.setInt(5, buffTableObject.getDoneType());
+                preparedStatement.setInt(6, buffTableObject.getUndoneReason());
+                return preparedStatement;
+            }, keyHolder);
+        }
+
+        Bypass changedBypass = bypassRepo.findById(bypassId);
+
+        return changedBypass;
     }
+
 }

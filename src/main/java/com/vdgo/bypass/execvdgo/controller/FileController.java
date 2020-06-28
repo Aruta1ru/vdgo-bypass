@@ -66,7 +66,7 @@ public class FileController {
 
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(x -> {
-            PreparedStatement preparedStatement = x.prepareStatement("INSERT INTO vdg_obj_files (id_obj, name, size) VALUES (?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement preparedStatement = x.prepareStatement("INSERT INTO web_vdgo_files (id_obj, name, size) VALUES (?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setInt(1, objId);
             preparedStatement.setString(2, name);
             preparedStatement.setLong(3, file.getSize());
