@@ -13,9 +13,9 @@ import java.time.LocalDateTime;
 
 @Entity
 //for MSSQL connection
-//@Table(name = "vdg_obj_work", catalog = "tmp_to_ch_dog", schema="dbo")
+@Table(name = "web_vdgo_bypass", catalog = "to_ch_dog", schema="dbo")
 //for PostgreSQL connection
-@Table(name = "web_vdgo_bypass")
+//@Table(name = "web_vdgo_bypass")
 @ToString(of = {"id", "address", "dogType", "executor", "bypassDate", "doneType", "undoneReason", "fixed", "created"})
 @EqualsAndHashCode(of = {"id"})
 public class Bypass {
@@ -61,9 +61,9 @@ public class Bypass {
 
     @Column(name = "is_created")
     @JsonView(Views.BypassView.class)
-    private boolean created;
+    private int created;
 
-    public Bypass(int id, Addr address, DogTypeEnum dogType, Executor executor, LocalDateTime bypassDate, BypassDoneTypeEnum doneType, UndoneReason undoneReason, boolean fixed, boolean created) {
+    public Bypass(int id, Addr address, DogTypeEnum dogType, Executor executor, LocalDateTime bypassDate, BypassDoneTypeEnum doneType, UndoneReason undoneReason, boolean fixed, int created) {
         this.id = id;
         this.address = address;
         this.dogType = dogType;
@@ -149,11 +149,11 @@ public class Bypass {
         this.fixed = fixed;
     }
 
-    public boolean isCreated() {
+    public int getCreated() {
         return created;
     }
 
-    public void setCreated(boolean created) {
+    public void setCreated(int created) {
         this.created = created;
     }
 

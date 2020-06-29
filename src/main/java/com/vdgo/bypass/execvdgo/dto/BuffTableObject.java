@@ -15,9 +15,9 @@ public class BuffTableObject {
 
     private int doneType;
     private int undoneReason;
-    private boolean created;
+    private int created;
 
-    public BuffTableObject(int idObject, int idExecutor, LocalDateTime dateAction, int doneType, int undoneReason, boolean created) {
+    public BuffTableObject(int idObject, int idExecutor, LocalDateTime dateAction, int doneType, int undoneReason, int created) {
         this.idObject = idObject;
         this.idExecutor = idExecutor;
         this.dateAction = dateAction;
@@ -46,7 +46,7 @@ public class BuffTableObject {
         return dateAction;
     }
 
-    public boolean isCreated() {
+    public int getCreated() {
         return created;
     }
 

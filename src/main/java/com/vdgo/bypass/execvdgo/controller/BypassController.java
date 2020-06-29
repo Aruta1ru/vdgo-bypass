@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.List;
 
 @RestController
@@ -52,10 +53,10 @@ public class BypassController {
     @PostMapping("{id}")
     public Bypass save(@PathVariable("id") int bypassId, @RequestBody BuffTableObject buffTableObject) {
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
-        if (buffTableObject.isCreated())
+        if (buffTableObject.getCreated() == 1)
         {
             jdbcTemplate.update(x -> {
-                PreparedStatement preparedStatement = x.prepareStatement("UPDATE web_vdgo_buff_data SET exec_vdgo=?, undone_reason=? WHERE id_bypass=?");
+                PreparedStatement preparedStatement = x.prepareStatement("UPDATE web_vdgo_buff_data SET exec_vdgo=?, undone_reason=? WHERE id_bypass=?", Statement.RETURN_GENERATED_KEYS);
                 preparedStatement.setInt(1, buffTableObject.getDoneType());
                 preparedStatement.setInt(2, buffTableObject.getUndoneReason());
                 preparedStatement.setInt(3, bypassId);
@@ -63,7 +64,7 @@ public class BypassController {
             }, keyHolder);}
         else {
             jdbcTemplate.update(x -> {
-                PreparedStatement preparedStatement = x.prepareStatement("INSERT INTO web_vdgo_buff_data (id_bypass, id_obj, id_exec, date_action, exec_vdgo, undone_reason) VALUES (?, ?, ?, ?, ?, ?)");
+                PreparedStatement preparedStatement = x.prepareStatement("INSERT INTO web_vdgo_buff_data (id_bypass, id_obj, id_exec, date_action, exec_vdgo, undone_reason) VALUES (?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
                 preparedStatement.setInt(1, bypassId);
                 preparedStatement.setInt(2, buffTableObject.getIdObject());
                 preparedStatement.setInt(3, buffTableObject.getIdExecutor());

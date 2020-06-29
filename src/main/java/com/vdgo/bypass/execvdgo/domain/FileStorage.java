@@ -6,8 +6,8 @@ import com.fasterxml.jackson.annotation.JsonView;
 import javax.persistence.*;
 
 @Entity
-//@Table(name = "vdg_obj_files", catalog = "tmp_to_ch_dog", schema = "dbo")
-@Table(name = "web_vdgo_files")
+@Table(name = "web_vdgo_files", catalog = "to_ch_dog", schema = "dbo")
+//@Table(name = "web_vdgo_files")
 public class FileStorage {
 
     @Id

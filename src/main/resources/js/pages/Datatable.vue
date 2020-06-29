@@ -43,6 +43,8 @@
           vertical
         ></v-divider>
     <v-spacer> </v-spacer>
+    <h4>{{bypassRows.length}} адресов на сегодня </h4>
+    <v-spacer> </v-spacer>
      <v-text-field
                           v-model="search"
                           :append-icon="searchIcon"

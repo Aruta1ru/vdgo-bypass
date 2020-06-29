@@ -1,6 +1,5 @@
 package com.vdgo.bypass.execvdgo.domain;
 
-import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.ToString;
 
@@ -10,7 +9,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "web_vdgo_undone_spr")
+@Table(name = "web_vdgo_undone_spr", catalog = "to_ch_dog", schema = "dbo")
+//@Table(name = "web_vdgo_undone_spr")
 @ToString(of = {"id", "shortName"})
 public class UndoneReason {
 
