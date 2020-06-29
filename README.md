@@ -15,5 +15,5 @@
     (yarn add -D webpack webpack-cli webpack-dev-server babel-loader @babel/core @babel/preset-env vue-loader vue-template-compiler css-loader vue-style-loader)
     
 7. Запуск приложения в 2 этапа:
-    - фронт (npm start)
-    - бэк (обычный запуск приложения java)
+    - фронт (yarn start)
+    - бэк (execvdgo [bootRun])

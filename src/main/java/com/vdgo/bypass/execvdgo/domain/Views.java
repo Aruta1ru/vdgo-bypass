@@ -4,4 +4,8 @@ public final class Views {
     public interface BypassView {
 
     }
+
+    public interface UndoneReasonsView {
+
+    }
 }

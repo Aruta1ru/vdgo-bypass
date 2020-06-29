@@ -2,21 +2,21 @@ package com.vdgo.bypass.execvdgo.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.vdgo.bypass.execvdgo.enums.BypassDoneTypeEnum;
+import com.vdgo.bypass.execvdgo.enums.DogTypeEnum;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.hibernate.annotations.Immutable;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Immutable
 //for MSSQL connection
-@Table(name = "web_vdgo_bypass", catalog = "to_ch_dog", schema="dbo")
+//@Table(name = "vdg_obj_work", catalog = "tmp_to_ch_dog", schema="dbo")
 //for PostgreSQL connection
-//@Table(name = "vdg_obj_work")
-@ToString(of = {"id", "address", "dogType", "executor", "bypassDate", "doneType"})
+@Table(name = "web_vdgo_bypass")
+@ToString(of = {"id", "address", "dogType", "executor", "bypassDate", "doneType", "undoneReason", "fixed", "created"})
 @EqualsAndHashCode(of = {"id"})
 public class Bypass {
 
@@ -29,9 +29,10 @@ public class Bypass {
     @JsonView(Views.BypassView.class)
     private Addr address;
 
-    @Column(name = "dog_type")
+    @Column(name = "type_dog")
+    @Enumerated(EnumType.ORDINAL)
     @JsonView(Views.BypassView.class)
-    private String dogType;
+    private DogTypeEnum dogType;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_exec")
@@ -44,56 +45,118 @@ public class Bypass {
     @JsonFormat(pattern = "dd-MM-yyyy HH:mm")
     private LocalDateTime bypassDate;
 
-    @Column(name = "exec_vdgo")
-    @JsonView(Views.BypassView.class)
-    private byte doneTypeReal;
-
     @Column(name = "web_exec")
     @JsonView(Views.BypassView.class)
-    private byte doneType;
-
-    @Column(name = "fixed")
-    @JsonView(Views.BypassView.class)
-    private boolean fixed;
+    @Enumerated(EnumType.ORDINAL)
+    private BypassDoneTypeEnum doneType;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "undone_reason")
     @JsonView(Views.BypassView.class)
     private UndoneReason undoneReason;
 
+    @Column(name = "fixed")
+    @JsonView(Views.BypassView.class)
+    private boolean fixed;
+
+    @Column(name = "is_created")
+    @JsonView(Views.BypassView.class)
+    private boolean created;
+
+    public Bypass(int id, Addr address, DogTypeEnum dogType, Executor executor, LocalDateTime bypassDate, BypassDoneTypeEnum doneType, UndoneReason undoneReason, boolean fixed, boolean created) {
+        this.id = id;
+        this.address = address;
+        this.dogType = dogType;
+        this.executor = executor;
+        this.bypassDate = bypassDate;
+        this.doneType = doneType;
+        this.undoneReason = undoneReason;
+        this.fixed = fixed;
+        this.created = created;
+    }
+
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public Addr getAddress() {
         return address;
     }
 
+    public void setAddress(Addr address) {
+        this.address = address;
+    }
+
+    public DogTypeEnum getDogType() {
+        return dogType;
+    }
+
+    public void setDogType(DogTypeEnum dogType) {
+        this.dogType = dogType;
+    }
+
     public Executor getExecutor() {
         return executor;
+    }
+
+    public void setExecutor(Executor executor) {
+        this.executor = executor;
     }
 
     public LocalDateTime getBypassDate() {
         return bypassDate;
     }
 
-    public String getDogType() {
-        return dogType;
+    public void setBypassDate(LocalDateTime bypassDate) {
+        this.bypassDate = bypassDate;
     }
 
-    public byte getDoneType() {
+    public BypassDoneTypeEnum getDoneType() {
         return doneType;
+    }
+
+    public int getDoneTypeNum() {
+        int returnValue = 0;
+        switch (this.doneType) {
+            case INWORK: returnValue = 0; break;
+            case DONE: returnValue = 1; break;
+            case UNDONE: returnValue = 2; break;
+        }
+        return returnValue;
+    }
+
+    public void setDoneType(BypassDoneTypeEnum doneType) {
+        this.doneType = doneType;
     }
 
     public UndoneReason getUndoneReason() {
         return undoneReason;
     }
 
-    public byte getDoneTypeReal() {
-        return doneTypeReal;
+    public void setUndoneReason(UndoneReason undoneReason) {
+        this.undoneReason = undoneReason;
     }
 
     public boolean isFixed() {
         return fixed;
+    }
+
+    public void setFixed(boolean fixed) {
+        this.fixed = fixed;
+    }
+
+    public boolean isCreated() {
+        return created;
+    }
+
+    public void setCreated(boolean created) {
+        this.created = created;
+    }
+
+    public Bypass() {
     }
 }

@@ -6,7 +6,8 @@ Vue.use(Vuex)
 export default new Vuex.Store({
     state: {
         profile: frontendData.profile,
-        bypasses: frontendData.bypasses
+        bypasses: frontendData.bypasses,
+        undoneReasons: frontendData.undoneReasons
     }
     }
 )

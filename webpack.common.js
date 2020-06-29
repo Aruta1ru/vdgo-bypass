@@ -1,5 +1,6 @@
 const path = require('path');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
+const PrerenderSPAPlugin = require('prerender-spa-plugin')
 
 module.exports = {
   entry: path.join(__dirname, 'src', 'main', 'resources', 'js', 'main.js'),
@@ -31,7 +32,13 @@ module.exports = {
   },
 
   plugins: [
-    new VueLoaderPlugin()
+    new VueLoaderPlugin(),
+    new PrerenderSPAPlugin({
+              // Required - The path to the webpack-outputted app to prerender.
+              staticDir: path.join(__dirname, 'dist'),
+              // Required - Routes to render.
+              routes: [ '/' ],
+            })
   ],
   resolve: {
       modules: [

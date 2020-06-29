@@ -12,9 +12,9 @@ import java.util.Set;
 
 @Entity
 //for MSSQL connection
-@Table(name = "one_bso_user", catalog = "dog", schema = "dbo")
+//@Table(name = "one_bso_user", catalog = "test_dog", schema = "dbo")
 //for PostgreSQL connection
-//@Table(name = "one_bso_user")
+@Table(name = "one_bso_user")
 @ToString(of = {"id", "name", "post", "valid"})
 @EqualsAndHashCode(of = {"id"})
 public class Executor implements Serializable, UserDetails {
@@ -47,6 +47,10 @@ public class Executor implements Serializable, UserDetails {
     @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "id_bso_user"))
     @Enumerated(EnumType.STRING)
     private Set<UserRole> authorities;
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getUsername() {
         return username;
@@ -93,6 +97,10 @@ public class Executor implements Serializable, UserDetails {
         return valid;
     }
 
+    public void setValid(boolean valid) {
+        this.valid = valid;
+    }
+
     public int getId() {
         return id;
     }
@@ -101,8 +109,15 @@ public class Executor implements Serializable, UserDetails {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getPost() {
         return post;
     }
 
+    public void setPost(String post) {
+        this.post = post;
+    }
 }
