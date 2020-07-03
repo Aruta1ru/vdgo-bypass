@@ -42,14 +42,15 @@ public class FileController {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    @GetMapping(
-            value = "{id}",
-            produces = MediaType.IMAGE_JPEG_VALUE
-    )
-    public @ResponseBody byte[] getImage(@PathVariable("id") FileStorage file) throws IOException {
-        InputStream in = getClass()
-                .getResourceAsStream(storageService.load(file.getName(), file.getAddress().getId()).toString());
-        return IOUtils.toByteArray(in);
+    @GetMapping("{id}")
+    @ResponseBody
+    public ResponseEntity<Resource> serveFile(@PathVariable int id) {
+
+        FileStorage image = fileStorageRepo.findById(id);
+
+        Resource file = storageService.loadAsResource(image.getName(), image.getAddress().getId());
+        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
+                "attachment; filename=\"" + file.getFilename() + "\"").body(file);
     }
 
     @GetMapping("/obj-download/{fileId:.+}")
@@ -73,16 +74,17 @@ public class FileController {
 
     @PostMapping("/obj-upload/{objId:.+}")
     @ResponseBody
-    public FileStorage uploadFile(@RequestParam("file") MultipartFile file, @PathVariable int objId) {
+    public FileStorage uploadFile(@RequestParam("file") MultipartFile file, @PathVariable int objId, @RequestParam("fileType") int fileType) {
 
         String name = storageService.store(file, objId);
 
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(x -> {
-            PreparedStatement preparedStatement = x.prepareStatement("INSERT INTO web_vdgo_files (id_obj, name, size) VALUES (?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement preparedStatement = x.prepareStatement("INSERT INTO web_vdgo_files (id_obj, name, size, file_type) VALUES (?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setInt(1, objId);
             preparedStatement.setString(2, name);
             preparedStatement.setLong(3, file.getSize());
+            preparedStatement.setInt(4, fileType);
             return preparedStatement;
         }, keyHolder);
         //TODO: Add insert success check
@@ -94,9 +96,9 @@ public class FileController {
 
     @PostMapping("/obj-upload-multiple/{objId:.+}")
     @ResponseBody
-    public List<FileStorage> uploadMultipleFiles(@RequestParam("files") MultipartFile[] files, @PathVariable int objId) {
+    public List<FileStorage> uploadMultipleFiles(@RequestParam("files") MultipartFile[] files, @PathVariable int objId, @RequestParam("fileType") int fileType) {
         return Arrays.stream(files)
-                .map(file -> uploadFile(file, objId))
+                .map(file -> uploadFile(file, objId, fileType))
                 .collect(Collectors.toList());
     }
 

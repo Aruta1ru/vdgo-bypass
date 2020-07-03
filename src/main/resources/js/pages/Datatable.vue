@@ -73,81 +73,80 @@
     </table>
     </v-expansion-panel-content>
     </v-expansion-panel>
-    <v-expansion-panel>
-            <v-expansion-panel-header>Прикрепленные изображения</v-expansion-panel-header>
-            <v-expansion-panel-content>
+                    <v-expansion-panel @click=getFiles(item)>
+                                <v-expansion-panel-header>Приложенные изображения</v-expansion-panel-header>
+                                                <v-expansion-panel-content>
+                                                <v-switch
+                                                @change=changeFileType(item)
+                                                class="mx-2"
+                                                v-bind:value = "switcherData.value"
+                                                v-bind:label = "switcherData.label"
+                                                >
+                                                </v-switch>
 
-              <v-container v-if="item.fileList.length > 0">
-                 <v-container v-for="file in item.fileList" :key="file.id" >
-        <table>
-        <tr>
-        <td width="auto">
-         <h5> {{ file.name | truncate(20, '...') }}  {{ parseFloat(file.size/1024).toFixed(2) }} КБайт </h5> </td>
-           <td width="5px">
-           <v-menu offset-y>
-                 <template v-slot:activator="{ on, attrs }">
-                   <v-btn
-                   fab
-                   x-small
-                     color="primary"
-                     dark
-                     v-bind="attrs"
-                     v-on="on"
-                   >
-                     <v-icon>
-                       {{ editIcon}}
-                     </v-icon>
+                                                    <v-carousel  hide-delimiters height="auto" :show-arrows="true">
+                                                       <v-carousel-item
+                                                         v-for="(item,i) in items"
+                                                         :key="i"
+                                                            >
+                                                       <v-card max-width="700"
+                                                               class="mx-auto">
+                                                        <v-img contain :src="item.src" height="380" aspect-ratio="1.77"></v-img>
+                                                        <v-card-actions>
+                                                              <v-btn
+                                                              @click=downloadFile(item.id)
+                                                                color="blue"
+                                                                x-small
+                                                                fab
+                                                              >
+                                                               <v-icon>
+                                                               {{downloadIcon}}
+                                                               </v-icon>
 
-                   </v-btn>
-                 </template>
-                 <v-list>
-                   <v-list-item
-                     @click=downloadFile(file)
-                   >
-                     <v-list-item-title>Скачать</v-list-item-title>
-                   </v-list-item>
-                                  <v-list-item
-                                    @click=deleteFile(file.id)
-                                  >
-                                    <v-list-item-title>Удалить</v-list-item-title>
-                                  </v-list-item>
+                                                              </v-btn>
+                                                              <v-btn
+                                                              @click=deleteFile(item.id)
+                                                                color="red"
+                                                                x-small
+                                                                fab
+                                                              >
+                                                              <v-icon> {{deleteIcon}} </v-icon>
 
+                                                              </v-btn>
+                                                            </v-card-actions>
+                                                         </v-card>
+                                                       </v-carousel-item>
+                                                     </v-carousel>
 
-                 </v-list>
-               </v-menu>
-               </td>
-        </tr>
-        </table>
-      </v-container>
-      </v-container>
+                                                     <v-container>
+                                                                <v-row>
+                                                                <v-flex  xs11
+                                                                         sm7
+                                                                         md4  >
 
-          <v-container>
-           <v-row>
-           <v-flex  xs11
-                    sm7
-                    md4  >
+                                                                     <v-file-input
+                                                                      v-model="files"
+                                                                      color="primary"
+                                                                      multiple
+                                                                      placeholder="Выберите изображения"
+                                                                      :prepend-icon="attachFilesIcon"
+                                                                      outlined
+                                                                      dense
+                                                                      accept="image/*"
+                                                                      @change="uploadFiles(item)"
+                                                                      rounded
+                                                                                                >
+                                                                       </v-file-input>
+                                                                       </v-flex>
+                                                                       </v-row>
+                                                                            </v-container>
 
-                <v-file-input
-                 v-model="files"
-                 color="primary"
-                 multiple
-                 placeholder="Выберите изображения"
-                 :prepend-icon="attachFilesIcon"
-                 outlined
-                 dense
-                 accept="image/*"
-                 @change="uploadFiles(item)"
-                                           >
-                  </v-file-input>
-                  </v-flex>
-                  </v-row>
-                       </v-container>
-            </v-expansion-panel-content>
-            </v-expansion-panel>
+                                                </v-expansion-panel-content>
+                                    </v-expansion-panel>
+
     </v-expansion-panels>
          </v-container>
          <v-divider> </v-divider>
-
 
     </td>
         </template>
@@ -165,7 +164,7 @@
       <template v-slot:item.actionUndone="{ item }">
                    <v-btn  fab depressed :disabled=getUndoneBtnStatus(item.doneType) small color="red" @click.native.stop ="setCurrentItem(item), dialog=true">
                              <v-icon>{{undoneIcon }}</v-icon>
-                   </v-btn>
+                  </v-btn>
                    </template>
   </v-data-table>
   </v-container>
@@ -217,6 +216,7 @@
           arr.id = data.id;
           arr.name = data.name;
           arr.size = data.size;
+          arr.fileType = data.fileType;
      return arr;
      }
 
@@ -238,7 +238,6 @@
                            arr.objectId=list[i].address.id;
                            arr.clientInfo=list[i].address.client;
                            arr.fileList=list[i].address.files;
-
                         tableList.push(arr);
                         arr = {};
                       }
@@ -252,6 +251,7 @@ import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiDelete, mdiCheck, mdiPa
   export default {
     data () {
       return {
+      items: [],
         searchIcon: mdiMagnify,
         cloudUploadIcon: mdiCloudUpload,
         downloadIcon: mdiCloudDownload,
@@ -278,6 +278,10 @@ import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiDelete, mdiCheck, mdiPa
         undoneReasons: frontendData.undoneReasons,
         currentItem: {},
         checkedValue: 0,
+        switcherData: {
+        value: 0,
+        label: "Переключить на документацию",
+        }
       }
     },
     methods: {
@@ -320,6 +324,20 @@ import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiDelete, mdiCheck, mdiPa
                     }
                   },
 
+                changeFileType(item) {
+                    //обычные фото
+                    if (this.switcherData.value === 0) {
+                        this.switcherData.label = "Переключить на фото";
+                        this.switcherData.value = 1;
+                    }
+                    //документация
+                    else if (this.switcherData.value === 1) {
+                        this.switcherData.label = "Переключить на документацию";
+                        this.switcherData.value = 0;
+                    }
+                    this.getFiles(item);
+                },
+
                 setExec(item, isDone, reason) {
                                 let bypass = frontendData.bypasses[getIndex(frontendData.bypasses, item.id)];
 
@@ -335,13 +353,27 @@ import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiDelete, mdiCheck, mdiPa
                                   );
                              },
 
-                downloadFile(file) { window.location.href = '/files/obj-download/'+ file.id;},
+                downloadFile(fId) { window.location.href = '/files/obj-download/'+ fId;},
+
+                getFiles(item) {
+                    this.items = [];
+                    let fileType = this.switcherData.value;
+                    for (let i = 0; i < item.fileList.length; i++) {
+                      let fileItem = {};
+                      if (item.fileList[i].fileType === fileType) {
+                      fileItem.id = item.fileList[i].id;
+                      fileItem.src = window.location.href+ `files\\${item.fileList[i].id}`;
+                      this.items.push(fileItem);
+                      };
+                    };
+                },
 
                 deleteFile(fId) {
                             removeFilesApi.delete(fId).then(result => {
                             if (result.ok) {
                             let arr = findIndexByFileId(this.bypassRows, fId);
                             this.bypassRows[arr.rowIndex].fileList.splice(arr.fileIndex, 1);
+                            this.getFiles(this.bypassRows[arr.rowIndex]);
                             }
                             })
                       },
@@ -349,14 +381,16 @@ import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiDelete, mdiCheck, mdiPa
                 uploadFiles(item) {
                             if (this.files) {
                                      let formData = new FormData();
+
                                      for (let file of this.files) {formData.append("files", file, file.name);}
-                                     this.$resource('/files/obj-upload-multiple{/objId}').save({objId: item.objectId}, formData).then(result =>
+                                     this.$resource('/files/obj-upload-multiple{/objId}').save({objId: item.objectId, fileType: this.switcherData.value}, formData).then(result =>
                                      {if (result.ok) {
                                                 result.json().then(data => {
                                                 const indexTable = this.bypassRows.indexOf(item);
                                                 for (let i = 0; i < data.length; i++) {
                                                 let arr = getFileInfo(data[i]);
                                                 this.bypassRows[indexTable].fileList.push(arr);
+                                                this.getFiles(this.bypassRows[indexTable]);
                                                    }
                                                 }
                                                 )

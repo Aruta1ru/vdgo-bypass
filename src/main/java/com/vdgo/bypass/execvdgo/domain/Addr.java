@@ -11,9 +11,9 @@ import java.util.List;
 
 @Entity
 //for MSSQL connection
-@Table(name = "ch_adr_obj", catalog = "to_ch_dog", schema = "dbo")
+//@Table(name = "ch_adr_obj", catalog = "to_ch_dog", schema = "dbo")
 //for PostgreSQL connection
-//@Table(name = "ch_adr_obj")
+@Table(name = "ch_adr_obj")
 @ToString(of = {"id", "addr"})
 @EqualsAndHashCode(of = {"id"})
 @Immutable

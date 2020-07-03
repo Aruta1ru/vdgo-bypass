@@ -6,8 +6,8 @@ import com.fasterxml.jackson.annotation.JsonView;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "web_vdgo_files", catalog = "to_ch_dog", schema = "dbo")
-//@Table(name = "web_vdgo_files")
+//@Table(name = "web_vdgo_files", catalog = "to_ch_dog", schema = "dbo")
+@Table(name = "web_vdgo_files")
 public class FileStorage {
 
     @Id
@@ -27,13 +27,18 @@ public class FileStorage {
     @JsonView(Views.BypassView.class)
     private long size;
 
+    @Column(name = "file_type")
+    @JsonView(Views.BypassView.class)
+    private int fileType;
+
     public FileStorage() {
     }
 
-    public FileStorage(Addr address, String name, long size) {
+    public FileStorage(Addr address, String name, long size, int fileType) {
         this.address = address;
         this.name = name;
         this.size = size;
+        this.fileType = fileType;
     }
 
     public int getId() {
@@ -51,4 +56,6 @@ public class FileStorage {
     public long getSize() {
         return size;
     }
+
+    public int getFileType() {return fileType;}
 }

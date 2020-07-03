@@ -9,8 +9,8 @@ import javax.persistence.*;
 
 @Entity
 @Immutable
-@Table(name = "to_ch_klient", catalog = "to_ch_dog", schema = "dbo")
-//@Table(name = "to_ch_klient")
+//@Table(name = "to_ch_klient", catalog = "to_ch_dog", schema = "dbo")
+@Table(name = "to_ch_klient")
 @ToString(of = {"id", "name", "phone"})
 public class Client {
 
