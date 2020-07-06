@@ -6,5 +6,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ExecutorRepo extends JpaRepository<Executor, Integer> {
-    Executor findByUsername(String username);
 }

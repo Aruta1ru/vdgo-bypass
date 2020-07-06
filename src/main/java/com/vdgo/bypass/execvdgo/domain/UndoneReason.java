@@ -43,14 +43,6 @@ public class UndoneReason {
         this.id = id;
     }
 
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
     public String getShortName() {
         return shortName;
     }

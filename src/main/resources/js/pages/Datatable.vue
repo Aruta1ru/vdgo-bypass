@@ -83,7 +83,6 @@
                                                 v-bind:label = "switcherData.label"
                                                 >
                                                 </v-switch>
-
                                                     <v-carousel  hide-delimiters height="auto" :show-arrows="true">
                                                        <v-carousel-item
                                                          v-for="(item,i) in items"

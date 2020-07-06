@@ -1,14 +1,9 @@
 package com.vdgo.bypass.execvdgo.domain;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.vdgo.bypass.execvdgo.enums.UserRole;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.springframework.security.core.userdetails.UserDetails;
-
 import javax.persistence.*;
-import java.io.Serializable;
-import java.util.Set;
 
 @Entity
 //for MSSQL connection
@@ -17,7 +12,7 @@ import java.util.Set;
 @Table(name = "one_bso_user")
 @ToString(of = {"id", "name", "post", "valid"})
 @EqualsAndHashCode(of = {"id"})
-public class Executor implements Serializable, UserDetails {
+public class Executor {
 
     @Id
     @Column(name = "id_bso_user")
@@ -32,65 +27,15 @@ public class Executor implements Serializable, UserDetails {
     @JsonView(Views.BypassView.class)
     private String post;
 
-    @Column(name = "username")
-    @JsonView(Views.BypassView.class)
-    private String username;
-
-    @Column(name = "password")
-    private String password;
-
     @Column(name = "valid")
     @JsonView(Views.BypassView.class)
     private boolean valid;
 
-    @ElementCollection(targetClass = UserRole.class, fetch = FetchType.EAGER)
-    @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "id_bso_user"))
-    @Enumerated(EnumType.STRING)
-    private Set<UserRole> authorities;
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "executor")
+    private User user;
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return isValid();
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    @Override
-    public Set<UserRole> getAuthorities() {
-        return this.authorities;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public boolean isValid() {

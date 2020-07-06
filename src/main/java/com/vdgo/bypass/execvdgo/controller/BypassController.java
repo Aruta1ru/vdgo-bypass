@@ -2,15 +2,14 @@ package com.vdgo.bypass.execvdgo.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.vdgo.bypass.execvdgo.domain.Bypass;
-import com.vdgo.bypass.execvdgo.domain.Executor;
+import com.vdgo.bypass.execvdgo.domain.User;
 import com.vdgo.bypass.execvdgo.domain.Views;
 import com.vdgo.bypass.execvdgo.dto.BuffTableObject;
 import com.vdgo.bypass.execvdgo.repo.BypassRepo;
-import com.vdgo.bypass.execvdgo.service.ExecutorService;
+import com.vdgo.bypass.execvdgo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -26,7 +25,7 @@ public class BypassController {
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    private ExecutorService executorService;
+    private UserService userService;
 
     @Autowired
     public BypassController(BypassRepo bypassRepo, JdbcTemplate jdbcTemplate) {
@@ -36,18 +35,9 @@ public class BypassController {
 
     @GetMapping
     @JsonView(Views.BypassView.class)
-    public List<Bypass> list(Principal principal, Model model) {
-
-        Executor executor = (Executor) executorService.loadUserByUsername(principal.getName());
-
-        List<Bypass> bypasses = bypassRepo.findByExecutor(executor);
-
-        return bypasses;
-    }
-
-    @GetMapping("{id}")
-    public Bypass getOne(@PathVariable("id") Bypass bypass) {
-        return bypass;
+    public List<Bypass> list(Principal principal) {
+        User user = (User) userService.loadUserByUsername(principal.getName());
+        return bypassRepo.findByExecutor(user.getExecutor());
     }
 
     @PostMapping("{id}")
@@ -75,9 +65,7 @@ public class BypassController {
             }, keyHolder);
         }
 
-        Bypass changedBypass = bypassRepo.findById(bypassId);
-
-        return changedBypass;
+        return bypassRepo.findById(bypassId);
     }
 
 }

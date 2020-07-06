@@ -6,8 +6,7 @@ Vue.use(VueRouter)
 
 const routes = [
     { path: '/', component: DataTable },
-   { path: '*', component:  DataTable  }
-
+   { path: '*', component:  DataTable  },
 ]
 
 export default new VueRouter({

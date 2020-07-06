@@ -122,7 +122,7 @@ public class Bypass {
     public int getDoneTypeNum() {
         int returnValue = 0;
         switch (this.doneType) {
-            case INWORK: returnValue = 0; break;
+            case INWORK: break;
             case DONE: returnValue = 1; break;
             case UNDONE: returnValue = 2; break;
         }

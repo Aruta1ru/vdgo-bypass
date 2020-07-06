@@ -1,6 +1,7 @@
 package com.vdgo.bypass.execvdgo.config;
 
-import com.vdgo.bypass.execvdgo.repo.ExecutorRepo;
+import com.vdgo.bypass.execvdgo.handlers.CustomAuthenticationFailureHandler;
+import com.vdgo.bypass.execvdgo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,28 +10,31 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import com.vdgo.bypass.execvdgo.service.AuthProvider;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+
 
 
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter
 {
-    @Autowired
-    private AuthProvider authProvider;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    protected void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userService).passwordEncoder(bCryptPasswordEncoder());
+    }
 
     @Autowired
-    private ExecutorRepo executorRepo;
+    UserService userService;
 
     @Bean
-    PasswordEncoder passwordEncoder()
-    {
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        return passwordEncoder;
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationFailureHandler customAuthenticationFailureHandler() {
+        return new CustomAuthenticationFailureHandler();
     }
 
     @Override
@@ -39,22 +43,23 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
         http
                 .antMatcher("/**")
                 .authorizeRequests()
-                // for API testing
-                //.antMatchers("/", "/bypass/62", "/files/obj-upload-multiple/**", "/files/obj-download/**", "/files/obj-upload/**", "/files/obj-delete/**", "/login**", "/js/**", "/error**").permitAll()
-                .antMatchers("/", "/login**", "/js/**", "/error**").permitAll()
+                .antMatchers("/login").not().fullyAuthenticated()
+                .antMatchers("/", "/js/**").permitAll()
                 .anyRequest().authenticated()
-                .and().formLogin().loginPage("/login")
-                .defaultSuccessUrl("/")
-                .failureUrl("/login").permitAll()
-                .and().logout().logoutSuccessUrl("/").permitAll()
                 .and()
-                .csrf().disable();
-
+                    .formLogin()
+                    .loginPage("/login")
+                    .defaultSuccessUrl("/")
+                    //.failureUrl("/")
+                    .failureHandler(customAuthenticationFailureHandler())
+                    .permitAll()
+                .and()
+                    .logout()
+                    .logoutSuccessUrl("/")
+                    .deleteCookies("JSESSIONID")
+                    .permitAll()
+                .and()
+                    .csrf().disable();
     }
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth)
-    {
-        auth.authenticationProvider(authProvider);
-    }
 }
