@@ -28,11 +28,14 @@ public class Addr {
     @JsonView(Views.BypassView.class)
     private String addr;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "address")
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "address")
     private List<FileStorage> files = new ArrayList<>();
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "address")
-    private Client client;
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "address")
+    private List<Equipment> equipment = new ArrayList<>();
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "address")
+    private List<Client> client = new ArrayList<>();
 
     public int getId() {
         return id;
@@ -44,7 +47,11 @@ public class Addr {
 
     public List<FileStorage> getFiles() { return files; }
 
-    public Client getClient() {
+    public List<Client> getClient() {
         return client;
+    }
+
+    public List<Equipment> getEquipment() {
+        return equipment;
     }
 }

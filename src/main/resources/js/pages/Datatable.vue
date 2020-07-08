@@ -1,25 +1,25 @@
 <template>
 <v-container>
-    <v-dialog v-model="dialog"  scrollable max-width="400px">
-      <v-card>
-        <v-card-title>Укажите причину</v-card-title>
-        <v-divider></v-divider>
-        <v-card-text style="height: 300px ">
-            <v-radio-group name="rgReason" v-model="dialogm1" column>
-            <v-container v-if="undoneReasons.length > 0">
-            <v-container v-for="reason in undoneReasons" :key="reason.id" >
-            <v-radio :value="reason.id" :label="reason.shortName"></v-radio>
-            </v-container>
-            </v-container>
-            </v-radio-group>
-          </v-card-text>
-        <v-divider></v-divider>
-                <v-card-actions>
-                  <v-btn color="primary" text @click="setExec(currentItem, 2, getCheckedValue()); dialog = false">Сохранить</v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
-      </v-dialog>
+<v-dialog v-model="dialog"  scrollable max-width="400px">
+<v-card>
+<v-card-title>Укажите причину</v-card-title>
+<v-divider></v-divider>
+<v-card-text style="height: 300px ">
+<v-radio-group name="rgReason" v-model="dialogm1" column>
+<v-container v-if="undoneReasons.length > 0">
+<v-container v-for="reason in undoneReasons" :key="reason.id" >
+<v-radio :value="reason.id" :label="reason.shortName"></v-radio>
+</v-container>
+</v-container>
+</v-radio-group>
+</v-card-text>
+<v-divider></v-divider>
+<v-card-actions>
+<v-btn color="primary" text @click="setExec(currentItem, 2, getCheckedValue()); dialog = false">Сохранить</v-btn>
+</v-card-actions>
+</v-card>
+</v-dialog>
+</v-dialog>
 
   <v-data-table
     :headers="headers"
@@ -58,33 +58,52 @@
     </template>
 
     <template v-slot:expanded-item="{ headers, item }">
-    <td :colspan="headers.length">
+    <td :colspan="headers.length"
+    >
     <v-container>
     <v-expansion-panels
     popout
-    :focusable="focusable">
-    <v-expansion-panel>
+    :focusable="focusable"
+    v-model="panels">
+    <v-expansion-panel >
     <v-expansion-panel-header>Информация о клиенте</v-expansion-panel-header>
     <v-expansion-panel-content>
-    <table>
-    <tr> <th> ФИО абонента </th> <td> {{item.clientInfo.name}} </td> </tr>
-    <tr> <th> Телефон </th> <td> {{ item.clientInfo.phone }} </td> </tr>
-    <tr> <th> Тип договора </th> <td> {{item.dogType}} </td> </tr>
+    <h4 class="pa-md-4"> Тип договора: {{item.dogType}} </h4>
+    <v-divider></v-divider>
+    <table v-for="client in item.clientList" :key="item.clientList.id">
+    <tr> <th> ФИО абонента </th> <td> {{client.name}} </td> </tr>
+    <tr> <th> Телефон </th> <td> {{ client.phone }} </td> </tr>
+    <v-divider></v-divider>
     </table>
     </v-expansion-panel-content>
     </v-expansion-panel>
-                    <v-expansion-panel @click=getFiles(item)>
-                                <v-expansion-panel-header>Приложенные изображения</v-expansion-panel-header>
-                                                <v-expansion-panel-content>
-                                                <v-switch
-                                                @change=changeFileType(item)
-                                                class="mx-2"
-                                                v-bind:value = "switcherData.value"
-                                                v-bind:label = "switcherData.label"
-                                                >
-                                                </v-switch>
+    <v-expansion-panel >
+        <v-expansion-panel-header>Оборудование</v-expansion-panel-header>
+        <v-expansion-panel-content>
+       <table v-if="item.equipmentList">
+           <tr>
+           <th> Наименование оборудования </th>
+           <th> Кол-во </th>
+           <th> Доля </th>
+           <th> Дата установки </th>
+           <th> Дата отключения </th>
+           </tr>
+           <tr v-for="equipment in item.equipmentList" :key=item.equipmentList.id>
+           <td> {{equipment.name}} </td>
+           <td> {{equipment.quantity}} </td>
+           <td> {{roundDouble(equipment.part)}} </td>
+           <td> {{getFormattedDate(equipment.installDate)}} </td>
+           <td> {{getFormattedDate(equipment.shutdownDate)}}</td>
+           </tr>
+           </table>
+        </v-expansion-panel-content>
+        </v-expansion-panel>
+
+    <v-expansion-panel @click=getFilesPhoto(item)>
+    <v-expansion-panel-header>Фотографии объекта</v-expansion-panel-header>
+    <v-expansion-panel-content v-bind:value="valuePhotoData" >
                                                     <v-carousel  hide-delimiters height="auto" :show-arrows="true">
-                                                       <v-carousel-item
+                                                      <v-carousel-item
                                                          v-for="(item,i) in items"
                                                          :key="i"
                                                             >
@@ -104,7 +123,7 @@
 
                                                               </v-btn>
                                                               <v-btn
-                                                              @click=deleteFile(item.id)
+                                                              @click=deleteFilePhoto(item.id)
                                                                 color="red"
                                                                 x-small
                                                                 fab
@@ -123,6 +142,8 @@
                                                                          sm7
                                                                          md4  >
 
+                                                                     <h2 class="pa-md-2">Загрузить: </h2>
+
                                                                      <v-file-input
                                                                       v-model="files"
                                                                       color="primary"
@@ -132,16 +153,88 @@
                                                                       outlined
                                                                       dense
                                                                       accept="image/*"
-                                                                      @change="uploadFiles(item)"
+                                                                      @change="uploadFilesPhoto(item)"
                                                                       rounded
                                                                                                 >
                                                                        </v-file-input>
+
                                                                        </v-flex>
-                                                                       </v-row>
+                                                                            </v-row>
                                                                             </v-container>
 
                                                 </v-expansion-panel-content>
                                     </v-expansion-panel>
+
+      <v-expansion-panel @click=getFilesITD(item)>
+          <v-expansion-panel-header>Исполнительная техническая документация</v-expansion-panel-header>
+          <v-expansion-panel-content v-bind:value="valueITDData">
+                                                          <v-carousel  hide-delimiters height="auto" :show-arrows="true">
+                                                             <v-carousel-item
+                                                               v-for="(item,i) in items"
+                                                               :key="i"
+                                                                  >
+                                                             <v-card max-width="700"
+                                                                     class="mx-auto">
+                                                              <v-img contain :src="item.src" height="380" aspect-ratio="1.77"></v-img>
+                                                              <v-card-actions>
+                                                                    <v-btn
+                                                                    @click=downloadFile(item.id)
+                                                                      color="blue"
+                                                                      x-small
+                                                                      fab
+                                                                    >
+                                                                     <v-icon>
+                                                                     {{downloadIcon}}
+                                                                     </v-icon>
+
+                                                                    </v-btn>
+                                                                    <v-btn
+                                                                    @click=deleteFileITD(item.id)
+                                                                      color="red"
+                                                                      x-small
+                                                                      fab
+                                                                    >
+                                                                    <v-icon> {{deleteIcon}} </v-icon>
+
+                                                                    </v-btn>
+                                                                  </v-card-actions>
+                                                               </v-card>
+                                                             </v-carousel-item>
+                                                           </v-carousel>
+
+                                                           <v-container>
+                                                                      <v-row>
+                                                                      <v-flex  xs11
+                                                                               sm7
+                                                                               md4  >
+
+                                                                            <h2 class="pa-md-2">Загрузить: </h2>
+
+                                                                           <v-file-input
+                                                                            v-model="files"
+                                                                            color="primary"
+                                                                            multiple
+                                                                            placeholder="Выберите изображения"
+                                                                            :prepend-icon="attachFilesIcon"
+                                                                            outlined
+                                                                            dense
+                                                                            accept="image/*"
+                                                                            @change="uploadFilesITD(item)"
+                                                                            rounded
+                                                                                                      >
+                                                                             </v-file-input>
+
+                                                                             </v-flex>
+                                                                             </v-row>
+                                                                                  </v-container>
+
+                                                      </v-expansion-panel-content>
+                                          </v-expansion-panel>
+
+
+
+
+
 
     </v-expansion-panels>
          </v-container>
@@ -170,10 +263,6 @@
 </template>
 
 <script>
-
-
-
-
   function getIndex(list, id) {
               for (let i = 0; i < list.length; i++ ) {
                   if (list[i].id === id) {
@@ -182,7 +271,6 @@
               }
               return -1
           }
-
           function    findOne(list, id) {
              for (let i = 0; i < list.length; i++ ) {
                   if (list[i].id === id) {
@@ -191,7 +279,6 @@
                                 }
                                 return null;
              }
-
   function findIndexByFileId(list, id) {
               let indexes = {};
               if (list.length > 0) {
@@ -209,7 +296,6 @@
               }
               return null;
   }
-
   function getFileInfo(data) {
      let arr = {};
           arr.id = data.id;
@@ -224,26 +310,23 @@
                       let bpDate = '';
                       let arr = {};
                       moment.locale('ru');
-
                       let tableList = [];
                       for (let i = 0; i < list.length; i++ ) {
                         bpDate = moment(list[i].bypassDate, 'DD-MM-YYYY HH:mm:ss');
-
                            arr.id=list[i].id;
                            arr.address= list[i].address.addr;
                            arr.bypassDate= bpDate.format('DD MMMM YYYY');
                            arr.doneType=list[i].doneType;
                            arr.dogType=list[i].dogType;
                            arr.objectId=list[i].address.id;
-                           arr.clientInfo=list[i].address.client;
+                           arr.clientList=list[i].address.client;
                            arr.fileList=list[i].address.files;
+                           arr.equipmentList=list[i].address.equipment;
                         tableList.push(arr);
                         arr = {};
                       }
-
                         return tableList;
                       }
-
 import bypassesApi from 'api/bypasses'
 import removeFilesApi from 'api/removeFiles'
 import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiDelete, mdiCheck, mdiPaperclip, mdiPencil,  mdiClose} from '@mdi/js'
@@ -264,6 +347,7 @@ import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiDelete, mdiCheck, mdiPa
         files: [],
         search: '',
         dialogm1: '',
+        panels: '',
         dialog: false,
         singleExpand: true,
         headers: [
@@ -277,14 +361,15 @@ import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiDelete, mdiCheck, mdiPa
         undoneReasons: frontendData.undoneReasons,
         currentItem: {},
         checkedValue: 0,
-        switcherData: {
-        value: 0,
-        label: "Переключить на документацию",
-        }
+        valuePhotoData: {
+        value: 0
+        },
+        valueITDData: {
+        value: 1
+        },
       }
     },
     methods: {
-
                 getColor (doneType) {
                     switch (doneType) {
                       case 'в работе':
@@ -300,46 +385,25 @@ import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiDelete, mdiCheck, mdiPa
                         return 'black';
                     }
                 },
-
                 setCurrentItem(item) {
                     this.currentItem = item;
                 },
-
                 getDoneBtnStatus (doneType) {
                     if (doneType === 'в работе' || doneType === 'не выполнено')  return false
                         else return true
                 },
-
                 getUndoneBtnStatus (doneType) {
                     if (doneType === 'в работе' || doneType === 'выполнено') return false
                         else return true
                 },
-
                  getCheckedValue() {
                     let radioBtns = document.getElementsByName("rgReason");
-
                     for (let i = 0; i < radioBtns.length; i++) {
                         if (radioBtns[i].checked) return radioBtns[i].value;
                     }
                   },
-
-                changeFileType(item) {
-                    //обычные фото
-                    if (this.switcherData.value === 0) {
-                        this.switcherData.label = "Переключить на фото";
-                        this.switcherData.value = 1;
-                    }
-                    //документация
-                    else if (this.switcherData.value === 1) {
-                        this.switcherData.label = "Переключить на документацию";
-                        this.switcherData.value = 0;
-                    }
-                    this.getFiles(item);
-                },
-
                 setExec(item, isDone, reason) {
                                 let bypass = frontendData.bypasses[getIndex(frontendData.bypasses, item.id)];
-
                                  bypassesApi.done(bypass, isDone, reason).then(result =>
                                      {
                                       result.json().then(data => {
@@ -351,12 +415,11 @@ import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiDelete, mdiCheck, mdiPa
                                       },
                                   );
                              },
-
                 downloadFile(fId) { window.location.href = '/files/obj-download/'+ fId;},
 
-                getFiles(item) {
+                getFilesITD(item) {
                     this.items = [];
-                    let fileType = this.switcherData.value;
+                    let fileType = this.valueITDData.value;
                     for (let i = 0; i < item.fileList.length; i++) {
                       let fileItem = {};
                       if (item.fileList[i].fileType === fileType) {
@@ -364,32 +427,69 @@ import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiDelete, mdiCheck, mdiPa
                       fileItem.src = window.location.href+ `files\\${item.fileList[i].id}`;
                       this.items.push(fileItem);
                       };
-                    };
+                   };
                 },
 
-                deleteFile(fId) {
+                 getFormattedDate(dt) {
+                  let moment = require('moment');
+                  moment.locale('ru');
+                  let resultDate = '';
+                  resultDate = moment(dt, 'DD-MM-YYYY HH:mm:ss');
+                  return resultDate.format('DD MMMM YYYY');
+                  },
+
+
+                        roundDouble(num) {
+                            return Math.round(num * 100) / 100;
+                        },
+
+                 getFilesPhoto(item) {
+                                    this.items = [];
+                                    let fileType = this.valuePhotoData.value;
+                                    for (let i = 0; i < item.fileList.length; i++) {
+                                      let fileItem = {};
+                                      if (item.fileList[i].fileType === fileType) {
+                                      fileItem.id = item.fileList[i].id;
+                                     fileItem.src = window.location.href+ `files\\${item.fileList[i].id}`;
+                                      this.items.push(fileItem);
+                                      };
+                                    };
+                                },
+
+
+
+                deleteFilePhoto(fId) {
                             removeFilesApi.delete(fId).then(result => {
                             if (result.ok) {
                             let arr = findIndexByFileId(this.bypassRows, fId);
                             this.bypassRows[arr.rowIndex].fileList.splice(arr.fileIndex, 1);
-                            this.getFiles(this.bypassRows[arr.rowIndex]);
+                            this.getFilesPhoto(this.bypassRows[arr.rowIndex]);
                             }
                             })
                       },
+               deleteFileITD(fId) {
+                             removeFilesApi.delete(fId).then(result => {
+                             if (result.ok) {
+                             let arr = findIndexByFileId(this.bypassRows, fId);
+                             this.bypassRows[arr.rowIndex].fileList.splice(arr.fileIndex, 1);
+                             this.getFilesITD(this.bypassRows[arr.rowIndex]);
+                                                 }
+                                                 })
+                                           },
 
-                uploadFiles(item) {
+
+                uploadFilesPhoto(item) {
                             if (this.files) {
                                      let formData = new FormData();
-
                                      for (let file of this.files) {formData.append("files", file, file.name);}
-                                     this.$resource('/files/obj-upload-multiple{/objId}').save({objId: item.objectId, fileType: this.switcherData.value}, formData).then(result =>
+                                     this.$resource('/files/obj-upload-multiple{/objId}').save({objId: item.objectId, fileType: this.valuePhotoData.value}, formData).then(result =>
                                      {if (result.ok) {
                                                 result.json().then(data => {
                                                 const indexTable = this.bypassRows.indexOf(item);
                                                 for (let i = 0; i < data.length; i++) {
                                                 let arr = getFileInfo(data[i]);
                                                 this.bypassRows[indexTable].fileList.push(arr);
-                                                this.getFiles(this.bypassRows[indexTable]);
+                                                this.getFilesPhoto(this.bypassRows[indexTable]);
                                                    }
                                                 }
                                                 )
@@ -397,14 +497,39 @@ import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiDelete, mdiCheck, mdiPa
                                                 }
                                                 );
                                      this.files = [];
-
                  }
                  },
 
-                expandRow (value) {this.expanded = value === this.expanded[0] ? [] : [value]},
-},
+                 uploadFilesITD(item) {
+                                             if (this.files) {
+                                                      let formData = new FormData();
+                                                      for (let file of this.files) {formData.append("files", file, file.name);}
+                                                      this.$resource('/files/obj-upload-multiple{/objId}').save({objId: item.objectId, fileType: this.valueITDData.value}, formData).then(result =>
+                                                      {if (result.ok) {
+                                                                 result.json().then(data => {
+                                                                 const indexTable = this.bypassRows.indexOf(item);
+                                                                 for (let i = 0; i < data.length; i++) {
+                                                                 let arr = getFileInfo(data[i]);
+                                                                 this.bypassRows[indexTable].fileList.push(arr);
+                                                                 this.getFilesITD(this.bypassRows[indexTable]);
+                                                                    }
+                                                                 }
+                                                                 )
+                                                                 }
+                                                                 }
+                                                                 );
+                                                      this.files = [];
+                                  }
+                                  },
 
+
+
+
+
+                expandRow (value) {this.expanded = value === this.expanded[0] ? [] : [value]},
+                },
                 filters: {
+
                                                              truncate: function (name, length, suffix) {
                                                                  if (name.length > length) {
                                                                      return name.substring(0, length) + suffix;
@@ -412,15 +537,15 @@ import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiDelete, mdiCheck, mdiPa
                                                                      return name;
                                                                  }
                                                              }
-                                                         }
-
-
-
-
-
+                                                         },
+                 watch: {
+                expanded: function() {
+                 this.panels = false
+                 }
+        }
         }
 </script>
 
 <style>
-
 <style>
+

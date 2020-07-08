@@ -27,7 +27,7 @@ public class Client {
     @JsonView(Views.BypassView.class)
     private String phone;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_object")
     @JsonIgnore
     private Addr address;
