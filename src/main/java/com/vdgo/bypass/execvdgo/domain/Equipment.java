@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Entity
 @Immutable
 @Table(name = "web_vdgo_ob")
-//@ToString(of = {"id", "address", "name", "quantity", "part", "installDate", "shutdownDate"})
+@ToString(of = {"id", "address", "name", "quantity", "part", "installDate", "shutdownDate"})
 public class Equipment {
 
     @Id
@@ -30,7 +30,7 @@ public class Equipment {
 
     @Column(name = "kol_oborud")
     @JsonView(Views.BypassView.class)
-    private int quantity;
+    private double quantity;
 
     @Column(name = "dol_ob")
     @JsonView(Views.BypassView.class)
@@ -44,7 +44,7 @@ public class Equipment {
     @JsonView(Views.BypassView.class)
     private LocalDateTime shutdownDate;
 
-    public Equipment(int id, Addr address, String name, int quantity, double part, LocalDateTime installDate, LocalDateTime shutdownDate) {
+    public Equipment(int id, Addr address, String name, double quantity, double part, LocalDateTime installDate, LocalDateTime shutdownDate) {
         this.id = id;
         this.address = address;
         this.name = name;
@@ -69,7 +69,7 @@ public class Equipment {
         return name;
     }
 
-    public int getQuantity() {
+    public double getQuantity() {
         return quantity;
     }
 

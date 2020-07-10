@@ -9,7 +9,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-//@Table(name = "web_vdgo_undone_spr", catalog = "to_ch_dog", schema = "dbo")
 @Table(name = "web_vdgo_undone_spr")
 @ToString(of = {"id", "shortName"})
 public class UndoneReason {

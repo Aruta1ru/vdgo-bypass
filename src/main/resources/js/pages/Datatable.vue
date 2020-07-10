@@ -29,7 +29,7 @@
     :search="search"
     @click:row="expandRow"
     item-key="id"
-    class="elevation-1"
+    class="elevation-0"
     hide-default-footer
     disable-pagination
   >
@@ -62,19 +62,24 @@
     >
     <v-container>
     <v-expansion-panels
-    popout
+    v-model="panels"
     :focusable="focusable"
-    v-model="panels">
+    accordion>
     <v-expansion-panel >
     <v-expansion-panel-header>Информация о клиенте</v-expansion-panel-header>
     <v-expansion-panel-content>
     <h4 class="pa-md-4"> Тип договора: {{item.dogType}} </h4>
     <v-divider></v-divider>
+    <v-container v-if="!item.clientList===null">
     <table v-for="client in item.clientList" :key="item.clientList.id">
     <tr> <th> ФИО абонента </th> <td> {{client.name}} </td> </tr>
     <tr> <th> Телефон </th> <td> {{ client.phone }} </td> </tr>
     <v-divider></v-divider>
     </table>
+    </v-container>
+    <v-container v-else>
+    <h4 class="pa-md-4"> Данные о клиенте отсутствуют </h4>
+    </v-container>
     </v-expansion-panel-content>
     </v-expansion-panel>
     <v-expansion-panel >
@@ -322,6 +327,7 @@
                            arr.clientList=list[i].address.client;
                            arr.fileList=list[i].address.files;
                            arr.equipmentList=list[i].address.equipment;
+                           arr.reason=list[i].undoneReason.shortName;
                         tableList.push(arr);
                         arr = {};
                       }
@@ -354,8 +360,10 @@ import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiDelete, mdiCheck, mdiPa
           { text: 'Адрес', value: 'address' },
           { text: 'Дата обхода', value: 'bypassDate' },
           { text: 'Статус выполнения', value: 'doneType' },
+          { text:'Причина невыполнения', value: 'reason'},
           { text: '', value: 'actionDone', sortable: false },
-          { text: '', value: 'actionUndone', sortable: false }
+          { text: '', value: 'actionUndone', sortable: false },
+
         ],
         bypassRows: getTableData(frontendData.bypasses),
         undoneReasons: frontendData.undoneReasons,

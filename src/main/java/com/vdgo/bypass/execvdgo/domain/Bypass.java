@@ -12,9 +12,6 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-//for MSSQL connection
-//@Table(name = "web_vdgo_bypass", catalog = "to_ch_dog", schema="dbo")
-//for PostgreSQL connection
 @Table(name = "web_vdgo_bypass")
 @ToString(of = {"id", "address", "dogType", "executor", "bypassDate", "doneType", "undoneReason", "fixed", "created"})
 @EqualsAndHashCode(of = {"id"})
