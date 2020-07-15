@@ -9,7 +9,7 @@ import javax.persistence.*;
 
 @Entity
 @Immutable
-@Table(name = "to_ch_klient")
+@Table(name = "web_vdgo_client")
 @ToString(of = {"id", "name", "phone"})
 public class Client {
 
