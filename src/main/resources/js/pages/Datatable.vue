@@ -37,6 +37,8 @@
     :single-expand="singleExpand"
     :expanded.sync="expanded"
     :search="search"
+    :loading="loading"
+    loading-text="Идёт загрузка адресов... Пожалуйста, подождите"
     @click:row="expandRow"
     item-key="id"
     class="elevation-0"
@@ -352,6 +354,7 @@ import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiCalendarRange, mdiDelet
     data () {
       return {
       items: [],
+        loading: false,
         picker: new Date().toISOString().substr(0, 10),
         selectedDate: new Date().toISOString().substr(0, 10),
         calendar: false,
@@ -427,11 +430,14 @@ import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiCalendarRange, mdiDelet
                   },
 
                 getNewBypasses(selectedDate) {
+                this.loading = true;
+                this.bypassRows = [];
                 this.selectedDate = selectedDate;
                     this.$resource('/bypass/byDate{/selDate}').get({selDate: selectedDate}).then(result => {
                         result.json().then(data => {
                             frontendData.bypasses = data;
                             this.bypassRows = getTableData(frontendData.bypasses);
+                            this.loading = false;
                         });
                     });
                 },

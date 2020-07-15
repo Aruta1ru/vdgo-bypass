@@ -7,9 +7,9 @@ import javax.persistence.*;
 
 @Entity
 //for MSSQL connection
-//@Table(name = "one_bso_user", catalog = "dog", schema = "dbo")
+@Table(name = "one_bso_user", catalog = "dog", schema = "dbo")
 //for PostgreSQL connection
-@Table(name = "one_bso_user")
+//@Table(name = "one_bso_user")
 @ToString(of = {"id", "name", "post", "valid"})
 @EqualsAndHashCode(of = {"id"})
 public class Executor {
