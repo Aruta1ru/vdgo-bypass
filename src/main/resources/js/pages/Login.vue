@@ -18,7 +18,11 @@
               <v-card-text>
                 <v-form
                  id="app" action="/login"  method="post">
-
+                <v-container v-if="error">
+                       <v-alert dense type="error">
+                         Неверно введён логин/пароль!
+                       </v-alert>
+                </v-container>
                   <v-text-field
                     id="username"
                     name="username"
@@ -59,6 +63,7 @@ import {mdiLock, mdiAccount} from '@mdi/js'
 export default {
         data () {
              return {
+            error: frontendData.error,
            lock: mdiLock ,
            account: mdiAccount
                }
