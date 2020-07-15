@@ -1,9 +1,7 @@
 package com.vdgo.bypass.execvdgo.controller;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import com.vdgo.bypass.execvdgo.domain.Bypass;
 import com.vdgo.bypass.execvdgo.domain.User;
-import com.vdgo.bypass.execvdgo.domain.Views;
 import com.vdgo.bypass.execvdgo.dto.BuffTableObject;
 import com.vdgo.bypass.execvdgo.repo.BypassRepo;
 import com.vdgo.bypass.execvdgo.service.UserService;
@@ -15,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -33,11 +33,15 @@ public class BypassController {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    @GetMapping
-    @JsonView(Views.BypassView.class)
-    public List<Bypass> list(Principal principal) {
+    @GetMapping(path = "/byDate/{selDate}")
+    @ResponseBody
+    public List<Bypass> list(Principal principal, @PathVariable(value = "selDate") String bypassDateStr) {
+
+        final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        final LocalDate bypassDate = LocalDate.parse(bypassDateStr, dtf);
+
         User user = (User) userService.loadUserByUsername(principal.getName());
-        return bypassRepo.findByExecutor(user.getExecutor());
+        return bypassRepo.findByExecutorAndBypassDate(user.getExecutor(), bypassDate.atStartOfDay());
     }
 
     @PostMapping("{id}")

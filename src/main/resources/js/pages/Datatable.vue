@@ -21,6 +21,16 @@
 </v-dialog>
 </v-dialog>
 
+<v-dialog
+          v-model="calendar"
+          width="290px"
+        >
+<v-date-picker no-title v-model="picker"  locale="ru" scrollable>
+<v-btn text color="primary" @click="calendar = false">Отмена</v-btn>
+<v-btn text color="primary" @click="calendar = false; getNewBypasses(picker)">OK</v-btn>
+</v-date-picker>
+        </v-dialog>
+
   <v-data-table
     :headers="headers"
     :items="bypassRows"
@@ -37,13 +47,16 @@
     <template v-slot:top>
       <v-toolbar flat>
 <v-toolbar-title > Заявки </v-toolbar-title>
+<v-btn color="primary" icon @click="calendar=true">
+<v-icon> {{calendarIcon}} </v-icon>
+</v-btn>
 <v-divider
           class="mx-4"
           inset
           vertical
         ></v-divider>
     <v-spacer> </v-spacer>
-    <h4>{{bypassRows.length}} адресов на сегодня </h4>
+    <h5>{{bypassRows.length}} адресов на {{getFormattedDate(selectedDate, 'YYYY-MM-DD', 'D MMMM YYYY')}} года</h5>
     <v-spacer> </v-spacer>
      <v-text-field
                           v-model="search"
@@ -97,8 +110,8 @@
            <td> {{equipment.name}} </td>
            <td> {{equipment.quantity}} </td>
            <td> {{roundDouble(equipment.part)}} </td>
-           <td> {{getFormattedDate(equipment.installDate)}} </td>
-           <td> {{getFormattedDate(equipment.shutdownDate)}}</td>
+           <td> {{getFormattedDate(equipment.installDate, 'DD-MM-YYYY HH:mm:ss', 'D MMMM YYYY')}} </td>
+           <td> {{getFormattedDate(equipment.shutdownDate, 'DD-MM-YYYY HH:mm:ss', 'D MMMM YYYY')}}</td>
            </tr>
            </table>
         </v-expansion-panel-content>
@@ -309,7 +322,6 @@
           arr.fileType = data.fileType;
      return arr;
      }
-
   function    getTableData(list) {
                       let moment = require('moment');
                       let bpDate = '';
@@ -320,7 +332,7 @@
                         bpDate = moment(list[i].bypassDate, 'DD-MM-YYYY HH:mm:ss');
                            arr.id=list[i].id;
                            arr.address= list[i].address.addr;
-                           arr.bypassDate= bpDate.format('DD MMMM YYYY');
+                           arr.bypassDate= bpDate.format('D MMMM YYYY');
                            arr.doneType=list[i].doneType;
                            arr.dogType=list[i].dogType;
                            arr.objectId=list[i].address.id;
@@ -335,11 +347,15 @@
                       }
 import bypassesApi from 'api/bypasses'
 import removeFilesApi from 'api/removeFiles'
-import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiDelete, mdiCheck, mdiPaperclip, mdiPencil,  mdiClose} from '@mdi/js'
+import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiCalendarRange, mdiDelete, mdiCheck, mdiPaperclip, mdiPencil,  mdiClose} from '@mdi/js'
   export default {
     data () {
       return {
       items: [],
+        picker: new Date().toISOString().substr(0, 10),
+        selectedDate: new Date().toISOString().substr(0, 10),
+        calendar: false,
+        calendarIcon: mdiCalendarRange,
         searchIcon: mdiMagnify,
         cloudUploadIcon: mdiCloudUpload,
         downloadIcon: mdiCloudDownload,
@@ -363,7 +379,6 @@ import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiDelete, mdiCheck, mdiPa
           { text:'Причина невыполнения', value: 'reason'},
           { text: '', value: 'actionDone', sortable: false },
           { text: '', value: 'actionUndone', sortable: false },
-
         ],
         bypassRows: getTableData(frontendData.bypasses),
         undoneReasons: frontendData.undoneReasons,
@@ -410,6 +425,17 @@ import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiDelete, mdiCheck, mdiPa
                         if (radioBtns[i].checked) return radioBtns[i].value;
                     }
                   },
+
+                getNewBypasses(selectedDate) {
+                this.selectedDate = selectedDate;
+                    this.$resource('/bypass/byDate{/selDate}').get({selDate: selectedDate}).then(result => {
+                        result.json().then(data => {
+                            frontendData.bypasses = data;
+                            this.bypassRows = getTableData(frontendData.bypasses);
+                        });
+                    });
+                },
+
                 setExec(item, isDone, reason) {
                                 let bypass = frontendData.bypasses[getIndex(frontendData.bypasses, item.id)];
                                  bypassesApi.done(bypass, isDone, reason).then(result =>
@@ -424,7 +450,6 @@ import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiDelete, mdiCheck, mdiPa
                                   );
                              },
                 downloadFile(fId) { window.location.href = '/files/obj-download/'+ fId;},
-
                 getFilesITD(item) {
                     this.items = [];
                     let fileType = this.valueITDData.value;
@@ -437,20 +462,18 @@ import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiDelete, mdiCheck, mdiPa
                       };
                    };
                 },
-
-                 getFormattedDate(dt) {
+                 getFormattedDate(dt, inputPattern, outputPattern) {
                   let moment = require('moment');
                   moment.locale('ru');
                   let resultDate = '';
-                  resultDate = moment(dt, 'DD-MM-YYYY HH:mm:ss');
-                  return resultDate.format('DD MMMM YYYY');
+                  //resultDate = moment(dt, 'DD-MM-YYYY HH:mm:ss');
+                  resultDate = moment(dt, inputPattern);
+                  //return resultDate.format('DD MMMM YYYY');
+                  return resultDate.format(outputPattern);
                   },
-
-
                         roundDouble(num) {
                             return Math.round(num * 100) / 100;
                         },
-
                  getFilesPhoto(item) {
                                     this.items = [];
                                     let fileType = this.valuePhotoData.value;
@@ -463,9 +486,6 @@ import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiDelete, mdiCheck, mdiPa
                                       };
                                     };
                                 },
-
-
-
                 deleteFilePhoto(fId) {
                             removeFilesApi.delete(fId).then(result => {
                             if (result.ok) {
@@ -484,8 +504,6 @@ import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiDelete, mdiCheck, mdiPa
                                                  }
                                                  })
                                            },
-
-
                 uploadFilesPhoto(item) {
                             if (this.files) {
                                      let formData = new FormData();
@@ -507,7 +525,6 @@ import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiDelete, mdiCheck, mdiPa
                                      this.files = [];
                  }
                  },
-
                  uploadFilesITD(item) {
                                              if (this.files) {
                                                       let formData = new FormData();
@@ -529,15 +546,9 @@ import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiDelete, mdiCheck, mdiPa
                                                       this.files = [];
                                   }
                                   },
-
-
-
-
-
                 expandRow (value) {this.expanded = value === this.expanded[0] ? [] : [value]},
                 },
                 filters: {
-
                                                              truncate: function (name, length, suffix) {
                                                                  if (name.length > length) {
                                                                      return name.substring(0, length) + suffix;
@@ -556,4 +567,3 @@ import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiDelete, mdiCheck, mdiPa
 
 <style>
 <style>
-

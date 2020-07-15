@@ -21,7 +21,7 @@ public class CustomAuthenticationFailureHandler
             throws IOException {
 
             getRedirectStrategy().sendRedirect(request, response,
-                    "/");
+                    "/?error");
 
     }
 }

@@ -15,6 +15,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -36,15 +38,17 @@ public class MainController
 
     @GetMapping
     @JsonView(Views.UndoneReasonsView.class)
-    public String main(Model model, @AuthenticationPrincipal UserDetails userDetails) {
+    public String main(Model model, HttpServletRequest request, @AuthenticationPrincipal UserDetails userDetails) {
         HashMap<Object, Object> data = new HashMap<>();
 
-        User user = (User) userDetails;
+        if (request.getParameterMap().containsKey("error"))
+            data.put("error", true);
 
+        User user = (User) userDetails;
         data.put("profile", user);
         data.put("undoneReasons", undoneReasonRepo.findAll());
         if (user != null)
-        data.put("bypasses", bypassRepo.findByExecutor(user.getExecutor()));
+        data.put("bypasses", bypassRepo.findByExecutorAndBypassDate(user.getExecutor(), LocalDate.now().atStartOfDay()));
         else data.put("bypasses", new ArrayList<Bypass>());
 
         model.addAttribute("frontendData", data);
