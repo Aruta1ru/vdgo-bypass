@@ -10,14 +10,14 @@
     </v-btn>
     </v-app-bar>
 
-    <v-content>
+    <v-main>
     <v-container v-if="!profile" >
     <Login/>
     </v-container>
         <v-container v-if="profile">
            <router-view></router-view>
         </v-container>
-    </v-content>
+    </v-main>
     </v-app>
 </template>
 

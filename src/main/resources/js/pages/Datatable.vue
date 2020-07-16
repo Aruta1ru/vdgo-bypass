@@ -21,15 +21,11 @@
 </v-dialog>
 </v-dialog>
 
-<v-dialog
-          v-model="calendar"
-          width="290px"
-        >
-<v-date-picker no-title v-model="picker"  locale="ru" scrollable>
-<v-btn text color="primary" @click="calendar = false">Отмена</v-btn>
-<v-btn text color="primary" @click="calendar = false; getNewBypasses(picker)">OK</v-btn>
+<v-dialog v-model="calendar" width="290px">
+<v-date-picker no-title v-model="picker"
+@change="calendar = false; getNewBypasses(picker)"  locale="ru" scrollable>
 </v-date-picker>
-        </v-dialog>
+</v-dialog>
 
   <v-data-table
     :headers="headers"
@@ -37,229 +33,173 @@
     :single-expand="singleExpand"
     :expanded.sync="expanded"
     :search="search"
-    :loading="loading"
-    loading-text="Идёт загрузка адресов... Пожалуйста, подождите"
     @click:row="expandRow"
     item-key="id"
     class="elevation-0"
     hide-default-footer
     disable-pagination
+    :loading="loading"
+    loading-text="Идёт загрузка адресов... Пожалуйста, подождите"
   >
 
-    <template v-slot:top>
-      <v-toolbar flat>
+<template v-slot:top>
+<v-toolbar flat>
 <v-toolbar-title > Заявки </v-toolbar-title>
 <v-btn color="primary" icon @click="calendar=true">
 <v-icon> {{calendarIcon}} </v-icon>
 </v-btn>
-<v-divider
-          class="mx-4"
-          inset
-          vertical
-        ></v-divider>
-    <v-spacer> </v-spacer>
-    <h5>{{bypassRows.length}} адресов на {{getFormattedDate(selectedDate, 'YYYY-MM-DD', 'D MMMM YYYY')}} года</h5>
-    <v-spacer> </v-spacer>
-     <v-text-field
-                          v-model="search"
-                          :append-icon="searchIcon"
-                          label="Поиск"
-                          single-line
-                          hide-details
-                          class="mx-5"
-                        >
-                        </v-text-field>
-      </v-toolbar>
-    </template>
+<v-divider class="mx-4" inset vertical></v-divider>
+<v-spacer> </v-spacer>
+<h5>{{bypassRows.length}} адресов на {{getFormattedDate(selectedDate, 'YYYY-MM-DD', 'D MMMM YYYY')}} года </h5>
+<v-spacer> </v-spacer>
 
-    <template v-slot:expanded-item="{ headers, item }">
-    <td :colspan="headers.length"
-    >
-    <v-container>
-    <v-expansion-panels
-    v-model="panels"
-    :focusable="focusable"
-    accordion>
-    <v-expansion-panel >
-    <v-expansion-panel-header>Информация о клиенте</v-expansion-panel-header>
-    <v-expansion-panel-content>
+  <v-text-field
+   v-model="search"
+   :append-icon="searchIcon"
+   label="Поиск"
+   single-line
+   hide-details
+   class="mx-5">
+  </v-text-field>
+  </v-toolbar>
+  </template>
+
+  <template v-slot:expanded-item="{ headers, item }">
+  <td :colspan="headers.length">
+  <v-container>
+   <v-tabs v-model="tabs" vertical fixed >
+    <v-tab> <v-icon> {{clientIcon}} </v-icon> </v-tab>
+    <v-tab> <v-icon> {{equipmentIcon}} </v-icon> </v-tab>
+    <v-tab @change=getFilesPhoto(item) > <v-icon> {{ photoIcon }} </v-icon> </v-tab>
+    <v-tab @change=getFilesITD(item) > <v-icon> {{ itdIcon }} </v-icon> </v-tab>
+    <v-tabs-items v-model="tabs" touchless>
+    <v-tab-item>
     <h4 class="pa-md-4"> Тип договора: {{item.dogType}} </h4>
-    <v-divider></v-divider>
-    <v-container v-if="!item.clientList===null">
-    <table v-for="client in item.clientList" :key="item.clientList.id">
-    <tr> <th> ФИО абонента </th> <td> {{client.name}} </td> </tr>
-    <tr> <th> Телефон </th> <td> {{ client.phone }} </td> </tr>
-    <v-divider></v-divider>
-    </table>
-    </v-container>
-    <v-container v-else>
-    <h4 class="pa-md-4"> Данные о клиенте отсутствуют </h4>
-    </v-container>
-    </v-expansion-panel-content>
-    </v-expansion-panel>
-    <v-expansion-panel >
-        <v-expansion-panel-header>Оборудование</v-expansion-panel-header>
-        <v-expansion-panel-content>
-       <table v-if="item.equipmentList">
-           <tr>
-           <th> Наименование оборудования </th>
-           <th> Кол-во </th>
-           <th> Доля </th>
-           <th> Дата установки </th>
-           <th> Дата отключения </th>
-           </tr>
-           <tr v-for="equipment in item.equipmentList" :key=item.equipmentList.id>
-           <td> {{equipment.name}} </td>
-           <td> {{equipment.quantity}} </td>
-           <td> {{roundDouble(equipment.part)}} </td>
-           <td> {{getFormattedDate(equipment.installDate, 'DD-MM-YYYY HH:mm:ss', 'D MMMM YYYY')}} </td>
-           <td> {{getFormattedDate(equipment.shutdownDate, 'DD-MM-YYYY HH:mm:ss', 'D MMMM YYYY')}}</td>
-           </tr>
-           </table>
-        </v-expansion-panel-content>
-        </v-expansion-panel>
+     <v-divider></v-divider>
+           <v-container v-if="item.clientList.length">
+               <v-simple-table dense>
+               <thead>
+               <tr>
+               <th> ФИО абонента </th>
+               <th> Телефон </th>
+               </tr>
+               </thead>
+               <tbody>
+               <tr v-for="client in item.clientList" :key="item.clientList.id">
+               <td> {{client.name}} </td>
+               <td> {{ client.phone }} </td>
+               </tr>
+               </tbody>
+               </v-simple-table>
+               </v-container>
+               <v-container v-else>
+               <h4 class="pa-md-4"> Данные о клиенте отсутствуют </h4>
+               </v-container>
+               </v-tab-item>
 
-    <v-expansion-panel @click=getFilesPhoto(item)>
-    <v-expansion-panel-header>Фотографии объекта</v-expansion-panel-header>
-    <v-expansion-panel-content v-bind:value="valuePhotoData" >
-                                                    <v-carousel  hide-delimiters height="auto" :show-arrows="true">
-                                                      <v-carousel-item
-                                                         v-for="(item,i) in items"
-                                                         :key="i"
-                                                            >
-                                                       <v-card max-width="700"
-                                                               class="mx-auto">
-                                                        <v-img contain :src="item.src" height="380" aspect-ratio="1.77"></v-img>
-                                                        <v-card-actions>
-                                                              <v-btn
-                                                              @click=downloadFile(item.id)
-                                                                color="blue"
-                                                                x-small
-                                                                fab
-                                                              >
-                                                               <v-icon>
-                                                               {{downloadIcon}}
-                                                               </v-icon>
+          <v-tab-item>
+             <v-simple-table dense v-if="item.equipmentList" >
+             <thead>
+              <tr>
+              <th> Наименование оборудования </th>
+              <th> Кол-во </th>
+              <th> Доля </th>
+              <th> Дата установки </th>
+              <th> Дата отключения </th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr v-for="equipment in item.equipmentList" :key=item.equipmentList.id>
+              <td> {{equipment.name}} </td>
+              <td> {{equipment.quantity}} </td>
+              <td> {{roundDouble(equipment.part)}} </td>
+              <td> {{getFormattedDate(equipment.installDate, 'DD-MM-YYYY HH:mm:ss', 'D MMMM YYYY')}} </td>
+              <td> {{getFormattedDate(equipment.shutdownDate, 'DD-MM-YYYY HH:mm:ss', 'D MMMM YYYY')}}</td>
+              </tr>
+              </tbody>
+              </v-simple-table>
+              </v-tab-item>
 
-                                                              </v-btn>
-                                                              <v-btn
-                                                              @click=deleteFilePhoto(item.id)
-                                                                color="red"
-                                                                x-small
-                                                                fab
-                                                              >
-                                                              <v-icon> {{deleteIcon}} </v-icon>
+          <v-tab-item>
+          <v-container v-bind:value="valuePhotoData">
+          <v-carousel  hide-delimiters height="auto" :show-arrows="true">
+          <v-carousel-item v-for="(item,i) in items" :key="i">
+          <v-card max-width="700" class="mx-auto">
+          <v-img contain :src="item.src" height="380" aspect-ratio="1.77"></v-img>
+          <v-card-actions>
+          <v-btn @click=downloadFile(item.id) color="blue" x-small fab >
+          <v-icon> {{downloadIcon}} </v-icon> </v-btn>
+          <v-btn @click=deleteFilePhoto(item.id) color="red" x-small fab >
+          <v-icon> {{deleteIcon}} </v-icon> </v-btn>
+          </v-card-actions>
+          </v-card>
+          </v-carousel-item>
+          </v-carousel>
 
-                                                              </v-btn>
-                                                            </v-card-actions>
-                                                         </v-card>
-                                                       </v-carousel-item>
-                                                     </v-carousel>
+          <v-container>
+          <v-row>
+          <v-flex  xs11 sm7 md4  >
+          <h2 class="pa-md-2">Загрузить: </h2>
+          <v-file-input
+          v-model="files"
+          color="primary"
+          multiple
+          :loading="uploadProgressPhoto"
+          placeholder="Выбрать изображения"
+          :prepend-icon="attachFilesIcon"
+          outlined
+          dense
+          accept="image/*"
+          @change="uploadFilesPhoto(item)"
+          rounded >
+          </v-file-input>
+          </v-flex>
+          </v-row>
+          </v-container>
+          </v-container>
+          </v-tab-item>
 
-                                                     <v-container>
-                                                                <v-row>
-                                                                <v-flex  xs11
-                                                                         sm7
-                                                                         md4  >
+           <v-tab-item>
+        <v-container v-bind:value="valueITDData">
+        <v-carousel  hide-delimiters height="auto" :show-arrows="true">
+         <v-carousel-item v-for="(item,i) in items" :key="i" >
+         <v-card max-width="700" class="mx-auto">
+         <v-img contain :src="item.src" height="380" aspect-ratio="1.77"></v-img>
+         <v-card-actions>
+         <v-btn @click=downloadFile(item.id) color="blue" x-small fab >
+         <v-icon> {{downloadIcon}} </v-icon> </v-btn>
+         <v-btn @click=deleteFileITD(item.id) color="red" x-small fab >
+         <v-icon> {{deleteIcon}} </v-icon> </v-btn>
+         </v-card-actions>
+         </v-card>
+         </v-carousel-item>
+         </v-carousel>
 
-                                                                     <h2 class="pa-md-2">Загрузить: </h2>
-
-                                                                     <v-file-input
-                                                                      v-model="files"
-                                                                      color="primary"
-                                                                      multiple
-                                                                      placeholder="Выберите изображения"
-                                                                      :prepend-icon="attachFilesIcon"
-                                                                      outlined
-                                                                      dense
-                                                                      accept="image/*"
-                                                                      @change="uploadFilesPhoto(item)"
-                                                                      rounded
-                                                                                                >
-                                                                       </v-file-input>
-
-                                                                       </v-flex>
-                                                                            </v-row>
-                                                                            </v-container>
-
-                                                </v-expansion-panel-content>
-                                    </v-expansion-panel>
-
-      <v-expansion-panel @click=getFilesITD(item)>
-          <v-expansion-panel-header>Исполнительная техническая документация</v-expansion-panel-header>
-          <v-expansion-panel-content v-bind:value="valueITDData">
-                                                          <v-carousel  hide-delimiters height="auto" :show-arrows="true">
-                                                             <v-carousel-item
-                                                               v-for="(item,i) in items"
-                                                               :key="i"
-                                                                  >
-                                                             <v-card max-width="700"
-                                                                     class="mx-auto">
-                                                              <v-img contain :src="item.src" height="380" aspect-ratio="1.77"></v-img>
-                                                              <v-card-actions>
-                                                                    <v-btn
-                                                                    @click=downloadFile(item.id)
-                                                                      color="blue"
-                                                                      x-small
-                                                                      fab
-                                                                    >
-                                                                     <v-icon>
-                                                                     {{downloadIcon}}
-                                                                     </v-icon>
-
-                                                                    </v-btn>
-                                                                    <v-btn
-                                                                    @click=deleteFileITD(item.id)
-                                                                      color="red"
-                                                                      x-small
-                                                                      fab
-                                                                    >
-                                                                    <v-icon> {{deleteIcon}} </v-icon>
-
-                                                                    </v-btn>
-                                                                  </v-card-actions>
-                                                               </v-card>
-                                                             </v-carousel-item>
-                                                           </v-carousel>
-
-                                                           <v-container>
-                                                                      <v-row>
-                                                                      <v-flex  xs11
-                                                                               sm7
-                                                                               md4  >
-
-                                                                            <h2 class="pa-md-2">Загрузить: </h2>
-
-                                                                           <v-file-input
-                                                                            v-model="files"
-                                                                            color="primary"
-                                                                            multiple
-                                                                            placeholder="Выберите изображения"
-                                                                            :prepend-icon="attachFilesIcon"
-                                                                            outlined
-                                                                            dense
-                                                                            accept="image/*"
-                                                                            @change="uploadFilesITD(item)"
-                                                                            rounded
-                                                                                                      >
-                                                                             </v-file-input>
-
-                                                                             </v-flex>
-                                                                             </v-row>
-                                                                                  </v-container>
-
-                                                      </v-expansion-panel-content>
-                                          </v-expansion-panel>
-
-
-
-
-
-
-    </v-expansion-panels>
+         <v-container>
+         <v-row>
+         <v-flex  xs11 sm7 md4  >
+         <h2 class="pa-md-2">Загрузить: </h2>
+         <v-file-input
+           v-model="files"
+           color="primary"
+           multiple
+           placeholder="Выбрать изображения"
+           :prepend-icon="attachFilesIcon"
+           outlined
+           :loading="uploadProgressITD"
+           dense
+           accept="image/*"
+           @change="uploadFilesITD(item)"
+           rounded >
+         </v-file-input>
+         </v-flex>
+         </v-row>
          </v-container>
-         <v-divider> </v-divider>
-
+         </v-container>
+        </v-tab-item>
+        </v-tabs-items>
+        </v-tabs>
+        </v-container>
     </td>
         </template>
 
@@ -326,7 +266,7 @@
      }
   function    getTableData(list) {
                       let moment = require('moment');
-                      let bpDate = '';
+                     let bpDate = '';
                       let arr = {};
                       moment.locale('ru');
                       let tableList = [];
@@ -349,7 +289,7 @@
                       }
 import bypassesApi from 'api/bypasses'
 import removeFilesApi from 'api/removeFiles'
-import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiCalendarRange, mdiDelete, mdiCheck, mdiPaperclip, mdiPencil,  mdiClose} from '@mdi/js'
+import { mdiImage, mdiFileCad, mdiTools, mdiAccountDetails, mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiCalendarRange, mdiDelete, mdiCheck, mdiPaperclip, mdiPencil,  mdiClose} from '@mdi/js'
   export default {
     data () {
       return {
@@ -367,12 +307,15 @@ import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiCalendarRange, mdiDelet
         undoneIcon: mdiClose,
         editIcon: mdiPencil,
         attachFilesIcon: mdiPaperclip,
+        clientIcon: mdiAccountDetails,
+        equipmentIcon: mdiTools,
+        photoIcon: mdiImage,
+        itdIcon: mdiFileCad,
         expanded: [],
-        focusable: true,
         files: [],
         search: '',
         dialogm1: '',
-        panels: '',
+        tabs: '',
         dialog: false,
         singleExpand: true,
         headers: [
@@ -393,6 +336,8 @@ import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiCalendarRange, mdiDelet
         valueITDData: {
         value: 1
         },
+        uploadProgressPhoto:false,
+        uploadProgressITD:false,
       }
     },
     methods: {
@@ -406,11 +351,26 @@ import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiCalendarRange, mdiDelet
                         break;
                       case 'не выполнено':
                         return 'red';
-                        break;
+                       break;
                       default:
                         return 'black';
                     }
                 },
+
+                getNewBypasses(selectedDate) {
+                                this.bypassRows=[];
+                                this.loading = true;
+                                this.selectedDate = selectedDate;
+                                    this.$resource('/bypass/byDate{/selDate}').get({selDate: selectedDate}).then(result => {
+                                        result.json().then(data => {
+                                            frontendData.bypasses = data;
+                                            this.bypassRows = getTableData(frontendData.bypasses);
+                                            this.loading=false
+                                        });
+                                    });
+                                },
+
+
                 setCurrentItem(item) {
                     this.currentItem = item;
                 },
@@ -428,20 +388,6 @@ import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiCalendarRange, mdiDelet
                         if (radioBtns[i].checked) return radioBtns[i].value;
                     }
                   },
-
-                getNewBypasses(selectedDate) {
-                this.loading = true;
-                this.bypassRows = [];
-                this.selectedDate = selectedDate;
-                    this.$resource('/bypass/byDate{/selDate}').get({selDate: selectedDate}).then(result => {
-                        result.json().then(data => {
-                            frontendData.bypasses = data;
-                            this.bypassRows = getTableData(frontendData.bypasses);
-                            this.loading = false;
-                        });
-                    });
-                },
-
                 setExec(item, isDone, reason) {
                                 let bypass = frontendData.bypasses[getIndex(frontendData.bypasses, item.id)];
                                  bypassesApi.done(bypass, isDone, reason).then(result =>
@@ -468,14 +414,14 @@ import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiCalendarRange, mdiDelet
                       };
                    };
                 },
-                 getFormattedDate(dt, inputPattern, outputPattern) {
+                 getFormattedDate(dt,inputPattern, outputPattern) {
                   let moment = require('moment');
                   moment.locale('ru');
                   let resultDate = '';
-                  //resultDate = moment(dt, 'DD-MM-YYYY HH:mm:ss');
-                  resultDate = moment(dt, inputPattern);
-                  //return resultDate.format('DD MMMM YYYY');
-                  return resultDate.format(outputPattern);
+                 //resultDate = moment(dt, 'DD-MM-YYYY HH:mm:ss');
+                                   resultDate = moment(dt, inputPattern);
+                                   //return resultDate.format('DD MMMM YYYY');
+                                   return resultDate.format(outputPattern);
                   },
                         roundDouble(num) {
                             return Math.round(num * 100) / 100;
@@ -512,6 +458,7 @@ import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiCalendarRange, mdiDelet
                                            },
                 uploadFilesPhoto(item) {
                             if (this.files) {
+                                     this.uploadProgressPhoto=true;
                                      let formData = new FormData();
                                      for (let file of this.files) {formData.append("files", file, file.name);}
                                      this.$resource('/files/obj-upload-multiple{/objId}').save({objId: item.objectId, fileType: this.valuePhotoData.value}, formData).then(result =>
@@ -522,7 +469,8 @@ import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiCalendarRange, mdiDelet
                                                 let arr = getFileInfo(data[i]);
                                                 this.bypassRows[indexTable].fileList.push(arr);
                                                 this.getFilesPhoto(this.bypassRows[indexTable]);
-                                                   }
+                                                }
+                                               this.uploadProgressPhoto=false;
                                                 }
                                                 )
                                                 }
@@ -533,6 +481,7 @@ import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiCalendarRange, mdiDelet
                  },
                  uploadFilesITD(item) {
                                              if (this.files) {
+                                                      this.uploadProgressITD=true;
                                                       let formData = new FormData();
                                                       for (let file of this.files) {formData.append("files", file, file.name);}
                                                       this.$resource('/files/obj-upload-multiple{/objId}').save({objId: item.objectId, fileType: this.valueITDData.value}, formData).then(result =>
@@ -544,6 +493,7 @@ import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiCalendarRange, mdiDelet
                                                                  this.bypassRows[indexTable].fileList.push(arr);
                                                                  this.getFilesITD(this.bypassRows[indexTable]);
                                                                     }
+                                                                 this.uploadProgressITD=false;
                                                                  }
                                                                  )
                                                                  }
@@ -565,7 +515,7 @@ import {mdiMagnify, mdiCloudUpload, mdiCloudDownload, mdiCalendarRange, mdiDelet
                                                          },
                  watch: {
                 expanded: function() {
-                 this.panels = false
+                 this.tabs = false
                  }
         }
         }
